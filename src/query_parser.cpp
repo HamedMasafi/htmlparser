@@ -4,7 +4,6 @@
 #include <wctype.h>
 #include <algorithm>
 #include <string>
-#include <iostream>
 
 query_parser::query_parser() : token_parser()
 {
@@ -52,19 +51,6 @@ void query_parser::parse()
     }
     rl.push_back(last_rule);
     rules.push_back(rl);
-
-    int i = 0;
-    for (auto l : rules) {
-        std::cout << "RULE: " << (++i) << std::endl;
-        for (auto r : l) {
-            std::wcout << L"   >id:" << r->id
-                       << L" tag:" << r->tag_name
-                       << L" is child:" << r->is_child
-                       << std::endl;
-            for (auto cls : r->classes)
-                std::wcout << L"      >" << cls << std::endl;
-        }
-    }
 }
 
 std::vector<html_tag *> query_parser::search()
@@ -113,10 +99,8 @@ bool query_parser::query_rule_t::check(html_tag *tag) const
     if (classes.size())
         for (auto cls : classes) {
             if (std::none_of(tag->_classes.begin(), tag->_classes.end(), [=](std::wstring c){
-                             std::wcout << c << std::endl;
                 return c == cls;
             })){
-                std::wcout << cls << L" not found" << std::endl;
                 return false;
             }
         }

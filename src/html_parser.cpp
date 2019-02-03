@@ -3,7 +3,6 @@
 #include "query_parser.h"
 #include "string_helper.h"
 
-#include <iostream>
 #include <stack>
 #include <vector>
 #include <wctype.h>

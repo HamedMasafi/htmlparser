@@ -1,7 +1,6 @@
 #include "css_doc.h"
 
 #include <algorithm>
-#include <iostream>
 #include "string_renderer.h"
 
 css_node::css_node()
@@ -90,7 +89,6 @@ void css_node::add_selector(const std::wstring &name)
 bool css_node::has_selector(const std::wstring &name)
 {
     return std::any_of(_selectors.begin(), _selectors.end(), [=](std::wstring &s){
-        std::wcout << s << "  <>  " << name << std::endl;
        return s == name;
     });
 }

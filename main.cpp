@@ -78,16 +78,16 @@ TEST_CASE("String", "[string]") {
     print("CSS formatted", css.to_string(print_type::formatted));
 }
 
-//TEST_CASE("Html", "[html]"){
-//    auto tags = html.query(L"p.par b");
-//    REQUIRE(1 == tags.size());
-//}
+TEST_CASE("Html", "[html]"){
+    auto tags = html.query(L"p.par b");
+    REQUIRE(1 == tags.size());
+}
 
-//TEST_CASE("CSS Rules", "[css]") {
-//    REQUIRE(4 == css.doc.size());
-//    REQUIRE(1 == css.find_match_selector(L"body").size());
-//    REQUIRE(2 == css.find_contains_selector(L".p").size());
-//}
+TEST_CASE("CSS Rules", "[css]") {
+    REQUIRE(4 == css.nodes().size());
+    REQUIRE(1 == css.find_match_selector(L"body").size());
+    REQUIRE(2 == css.find_contains_selector(L".p").size());
+}
 
 
 void debug() {
