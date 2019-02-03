@@ -66,6 +66,7 @@ void css_node::append(string_renderer &r)
     r.unindent();
     r.new_line();
     r.append(L"}");
+    r.new_line();
 }
 
 std::wstring css_doc::to_string(print_type type) const

@@ -255,8 +255,9 @@ void style_tag::append(string_renderer &r)
     r.append(L"<style>");
     r.indent();
     r.new_line();
-    if (rules.nodes().size())
-        for (auto i = rules.nodes().cbegin(); i != rules.nodes().cend(); ++i) {
+    auto nodes = rules.nodes();
+    if (nodes.size())
+        for (auto i = nodes.cbegin(); i != nodes.cend(); ++i) {
             (*i)->append(r);
             r.new_line();
         }

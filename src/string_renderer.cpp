@@ -42,6 +42,10 @@ void string_renderer::space()
 void string_renderer::indent()
 {
     _level++;
+
+    if (_last_action == last_action::new_line)
+        for (unsigned long i = 0; i < INDENT_SIZE; ++i)
+            _buffer.append(L" ");
 }
 
 void string_renderer::unindent()
