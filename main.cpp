@@ -4,11 +4,11 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "token_parser.h"
-#include "css_parser.h"
-#include "html_parser.h"
-#include "html_node.h"
-#include "query_parser.h"
+#include "include/token_parser.h"
+#include "include/css_parser.h"
+#include "include/html_parser.h"
+#include "include/html_node.h"
+#include "include/query_parser.h"
 
 static html_parser html;
 static css_parser css;
@@ -40,7 +40,7 @@ void init_test() {
                      <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">dfg</p>
                      <img src="image.png" />
                      <p id="p1" class="par">
-                     <b>Sample</b> paragraph متن فارسی
+                     <b>Sample</b> paragraph
                      <img src="image.png" />
                      </p>
                      </body>
@@ -74,6 +74,8 @@ TEST_CASE( "Init", "[init]" ) {
 TEST_CASE("String", "[string]") {
     print("HTML Formatted", html.root_tag()->to_string(print_type::formatted));
     print("HTML Compact", html.root_tag()->to_string(print_type::compact));
+    print("CSS compact", css.to_string(print_type::compact));
+    print("CSS formatted", css.to_string(print_type::formatted));
 }
 
 //TEST_CASE("Html", "[html]"){
@@ -93,7 +95,5 @@ void debug() {
     print(css.tokens());
     print("HTML compact", html.to_string());
     print("HTML formatted", html.to_string(print_type::formatted));
-    print("CSS compact", css.doc.to_string());
-    print("CSS formatted", css.doc.to_string(print_type::formatted));
 }
 

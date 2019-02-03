@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include "string_renderer.h"
 
 css_node::css_node()
 {
@@ -43,16 +44,36 @@ std::wstring css_node::to_string(print_type type) const
     return selectors + L"{" + ret + L"}";
 }
 
+void css_node::append(string_renderer &r)
+{
+    bool f = true;
+    for (std::wstring s : _selectors) {
+        if (!f)
+            r.append(L", ");
+        f = false;
+        r.append(s);
+    }
+    r.append(L" {");
+    r.indent();
+    for (auto it = _rules.begin(); it != _rules.end(); ++it) {
+        r.new_line();
+        r.append(it->first);
+        r.append(L":");
+        r.space();
+        r.append(it->second);
+        r.append(L";");
+    }
+    r.unindent();
+    r.new_line();
+    r.append(L"}");
+}
 
 std::wstring css_doc::to_string(print_type type) const
 {
-    std::wstring ret;
-    for (auto i = cbegin(); i != cend(); ++i) {
-        ret.append((*i)->to_string(type));
-        if (type == print_type::formatted)
-            ret.append(L"\n");
-    }
-    return ret;
+    string_renderer r(type);
+    for (auto i = cbegin(); i != cend(); ++i)
+        (*i)->append(r);
+    return r.to_string();
 }
 
 void css_node::set_attr(const std::wstring &name, const std::wstring &value)

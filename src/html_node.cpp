@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <string_renderer.h>
 
 bool html_tag::hasCloseTag() const
 {
@@ -24,66 +25,50 @@ std::vector<html_node *> html_tag::childs() const
 
 std::wstring html_tag::to_string(print_type type)
 {
-    if (type == print_type::compact)
-        return outter_html();
-
-    std::wstring html;// = L"<" + name;
-//    std::map<std::wstring, std::wstring>::iterator it;
-//    for(it = _attributes.begin(); it != _attributes.end(); ++it)
-//        html.append(L" " + it->first + L"=\"" + it->second + L"\"");
-
-//    if (_has_close_tag)
-//        html.append(L">");
-//    else
-//        html.append(L" />");
-
-//    if (type == print_type::formatted)
-//        html.append(L"\n");
-
-//    html.append(inner_html(type));
-
-//    if (type == print_type::formatted)
-//        html.append(L"\n");
-//    if (_has_close_tag) {
-//        html.append(L"</" + name + L">");
-//        if (type == print_type::formatted)
-//            html.append(L"\n");
-//    }
-
-    append(html, 0);
-
-    return html;
+    string_renderer r(type);
+    append(r);
+    return r.to_string();
 }
 
-void html_tag::append(std::wstring &html, const size_t &level)
+void html_tag::append(string_renderer &r)
 {
-    append_begin_tag(html, level);
-    append_inner_html(html, level);
-    append_end_tag(html, level);
+    r.new_line();
+    append_begin_tag(r);
+    if (_has_close_tag)
+        r.indent();
+    r.new_line();
+    append_inner_html(r);
+    if (_has_close_tag)
+        r.unindent();
+    append_end_tag(r);
+    r.new_line();
 }
 
-void html_tag::append_begin_tag(std::wstring &html, const size_t &level)
+void html_tag::append_begin_tag(string_renderer &r)
 {
-    html.append(std::wstring(level * 4, ' '));
-
-    html.append(L"<" + name);
+    r.append(L"<" + name);
     std::map<std::wstring, std::wstring>::iterator it;
     for(it = _attributes.begin(); it != _attributes.end(); ++it)
-        html.append(L" " + it->first + L"=\"" + it->second + L"\"");
+        r.append(L" " + it->first + L"=\"" + it->second + L"\"");
 
-    html.append(L">\n");
+    if (_has_close_tag)
+        r.append(L">");
+    else
+        r.append(L" />");
 }
 
-void html_tag::append_inner_html(std::wstring &html, const size_t &level)
+void html_tag::append_inner_html(string_renderer &r)
 {
     for (auto child : _childs)
-        child->append(html, level + 1);
+        child->append(r);
 }
 
-void html_tag::append_end_tag(std::wstring &html, const size_t &level)
+void html_tag::append_end_tag(string_renderer &r)
 {
-    html.append(std::wstring(level * 4, ' '));
-    html.append(L"</" + name + L">\n");
+    if (_has_close_tag) {
+        r.new_line();
+        r.append(L"</" + name + L">");
+    }
 }
 
 html_tag::html_tag() : html_node (), _css(new css_node)
@@ -242,9 +227,9 @@ std::wstring text_node::inner_text() const
     return  _text;
 }
 
-void text_node::append(std::wstring &html, const size_t &level)
+void text_node::append(string_renderer &r)
 {
-    html.append(std::wstring(level * 4, ' ') + _text + L"\n");
+    r.append(_text);
 }
 
 //css_doc style_tag::rules() const
@@ -259,19 +244,25 @@ void text_node::append(std::wstring &html, const size_t &level)
 
 std::wstring style_tag::inner_html() const
 {
-    if (rules.size())
+    if (rules.nodes().size())
         return std::wstring();
     else
         return rules.to_string();
 }
 
-void style_tag::append(std::wstring &html, const size_t &level)
+void style_tag::append(string_renderer &r)
 {
-    if (rules.size())
-        for (auto i = rules.cbegin(); i != rules.cend(); ++i)
-            html.append(std::wstring(level * 4, ' ')
-                        + (*i)->to_string(print_type::formatted)
-                        + L"\n");
+    r.append(L"<style>");
+    r.indent();
+    r.new_line();
+    if (rules.nodes().size())
+        for (auto i = rules.nodes().cbegin(); i != rules.nodes().cend(); ++i) {
+            (*i)->append(r);
+            r.new_line();
+        }
+    r.unindent();
+    r.append(L"</style>");
+    r.new_line();
 }
 
 style_tag::style_tag() : html_tag()
@@ -283,9 +274,7 @@ void style_tag::add_child(html_node *child)
 {
     text_node *tn = dynamic_cast<text_node*>(child);
     if (tn) {
-        css_parser cp;
-        cp.set_text(tn->text());
-        rules = cp.doc;
+        rules.set_text(tn->text());
     } else {
         std::cout << "Appending non-text node to style tag was not allowed";
     }

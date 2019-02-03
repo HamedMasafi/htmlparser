@@ -1,5 +1,11 @@
 #include "css_parser.h"
+#include "string_renderer.h"
 #include <wctype.h>
+
+std::vector<css_node *> css_parser::nodes() const
+{
+    return _nodes;
+}
 
 int css_parser::token(wint_t n)
 {
@@ -27,7 +33,7 @@ void css_parser::parse()
         }
         if (token == L"}") {
             inside_block = false;
-            doc.push_back(last_node);
+            _nodes.push_back(last_node);
             last_node = new css_node;
             continue;
         }
@@ -53,7 +59,7 @@ css_parser::~css_parser()
 std::vector<css_node *> css_parser::find_contains_selector(const std::wstring &selector)
 {
     std::vector<css_node *> ret;
-    for (css_node *node : doc)
+    for (css_node *node : _nodes)
         if (node->has_selector(selector))
             ret.push_back(node);
     return ret;
@@ -62,7 +68,7 @@ std::vector<css_node *> css_parser::find_contains_selector(const std::wstring &s
 std::vector<css_node *> css_parser::find_match_selector(const std::wstring &selector)
 {
     std::vector<css_node *> ret;
-    for (css_node *node : doc)
+    for (css_node *node : _nodes)
         if (node->selectors().size() == 1 && node->has_selector(selector))
             ret.push_back(node);
     return ret;
@@ -87,6 +93,14 @@ std::map<std::wstring, std::wstring> css_parser::parse_block()
     }
 
     return ret;
+}
+
+std::wstring css_parser::to_string(print_type type) const
+{
+    string_renderer r(type);
+    for (auto i = _nodes.cbegin(); i != _nodes.cend(); ++i)
+        (*i)->append(r);
+    return r.to_string();
 }
 
 

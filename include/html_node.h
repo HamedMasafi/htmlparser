@@ -3,10 +3,12 @@
 
 #include "global.h"
 #include "css_doc.h"
+#include "css_parser.h"
 #include <string>
 #include <vector>
 
 class css_node;
+class string_renderer;
 class html_node
 {
     html_node *_parent;
@@ -25,7 +27,7 @@ public:
         return  L"";
     }
 //protected:
-    virtual void append(std::wstring &html, const size_t &level) = 0;
+    virtual void append(string_renderer &r) = 0;
 };
 
 class text_node : public html_node
@@ -41,7 +43,7 @@ public:
     std::wstring inner_text() const;
 
 private:
-    void append(std::wstring &html, const size_t &level) override;
+    void append(string_renderer &r) override;
 };
 
 class html_tag : public html_node
@@ -80,17 +82,17 @@ public:
     std::wstring to_string(print_type type = print_type::compact);
 
 private:
-    void append(std::wstring &html, const size_t &level) override;
-    void append_begin_tag(std::wstring &html, const size_t &level);
-    void append_inner_html(std::wstring &html, const size_t &level);
-    void append_end_tag(std::wstring &html, const size_t &level);
+    void append(string_renderer &r) override;
+    void append_begin_tag(string_renderer &r);
+    void append_inner_html(string_renderer &r);
+    void append_end_tag(string_renderer &r);
 };
 
 class style_tag : public html_tag
 {
 
 public:
-    css_doc rules;
+    css_parser rules;
     style_tag();
 
     void add_child(html_node *child);
@@ -100,7 +102,7 @@ public:
     std::wstring inner_html() const;
 
 private:
-    void append(std::wstring &html, const size_t &level) override;
+    void append(string_renderer &r) override;
 };
 
 #endif // HTMLTAG_H

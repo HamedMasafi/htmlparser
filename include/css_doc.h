@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+class string_renderer;
 class css_node
 {
     std::vector<std::wstring> _selectors;
@@ -20,6 +21,7 @@ public:
         return _selectors;
     }
     std::wstring to_string(print_type type = print_type::compact) const;
+    void append(string_renderer &r);
 };
 
 class css_doc : public std::vector<css_node*>
