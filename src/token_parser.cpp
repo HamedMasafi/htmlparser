@@ -1,6 +1,6 @@
-#include "cssrules.h"
-#include "htmltag.h"
-#include "tokenparser.h"
+#include "css_doc.h"
+#include "html_node.h"
+#include "token_parser.h"
 #include "string_helper.h"
 
 #include <wctype.h>
@@ -11,16 +11,6 @@
 
 using namespace std;
 
-std::wstring token_parser::text() const
-{
-    return _text;
-}
-
-void token_parser::setText(const std::wstring &text)
-{
-    _text = text;
-}
-
 token_parser::token_parser()
 {
 }
@@ -30,9 +20,26 @@ token_parser::~token_parser()
 
 }
 
+std::wstring token_parser::text() const
+{
+    return _text;
+}
+
+void token_parser::set_text(const std::wstring &text)
+{
+    _text = text;
+    parse_tokens();
+    parse();
+}
+
+std::vector<std::wstring> token_parser::tokens() const
+{
+    return _tokens;
+}
+
 std::vector<std::wstring> token_parser::parse_tokens()
 {
-
+    _tokens.clear();
     for (std::size_t i = 0; i < _text.length(); ++i) {
         std::wstring last_token;
         auto ch = static_cast<wint_t>(_text.at(i));
@@ -84,15 +91,10 @@ std::vector<std::wstring> token_parser::parse_tokens()
     return _tokens;
 }
 
-void token_parser::parse()
-{
-    parse_tokens();
-}
-
 wstring token_parser::read_until(const wstring &text, size_t &i, std::function<int (int)> fn) const
 {
     size_t start = i;
-    while (fn(text.at(i))) {
+    while (text.length() > i  && fn(text.at(i))) {
         i++;
     }
     return text.substr(start, i - start);

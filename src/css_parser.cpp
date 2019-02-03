@@ -1,4 +1,4 @@
-#include "cssparser.h"
+#include "css_parser.h"
 #include <wctype.h>
 
 int css_parser::token(wint_t n)
@@ -12,13 +12,10 @@ css_parser::css_parser()
     _literals.push_back(new literal_t{L"/*", L"*/", L"", false, false});
 
     _check_fns.push_back(&css_parser::token);
-
-    _commants.push_back(new comment_t{L"/*", L"*/"});
 }
 
 void css_parser::parse()
 {
-    parse_tokens();
     bool inside_block = false;
     css_node *last_node = new css_node;
 
@@ -48,44 +45,48 @@ void css_parser::parse()
     }
 }
 
-void css_parser::parse_rules(css_node *node, size_t &i)
+css_parser::~css_parser()
 {
-    while (true) {
-        if (_tokens.size() < i + 2) {
-            _error_message = L"Unexpected end of document";
-            return;
-        }
 
+}
+
+std::vector<css_node *> css_parser::find_contains_selector(const std::wstring &selector)
+{
+    std::vector<css_node *> ret;
+    for (css_node *node : doc)
+        if (node->has_selector(selector))
+            ret.push_back(node);
+    return ret;
+}
+
+std::vector<css_node *> css_parser::find_match_selector(const std::wstring &selector)
+{
+    std::vector<css_node *> ret;
+    for (css_node *node : doc)
+        if (node->selectors().size() == 1 && node->has_selector(selector))
+            ret.push_back(node);
+    return ret;
+}
+
+std::map<std::wstring, std::wstring> css_parser::parse_block()
+{
+    size_t i = 0;
+    std::map<std::wstring, std::wstring> ret;
+    while (true) {
+        if (_tokens.size() > i + 3)
+            break;
         auto name = _tokens.at(i);
         auto colon = _tokens.at(i + 1);
         auto value = _tokens.at(i + 2);
 
-        if (colon != L":") {
-            _error_message = L"Unexpected " + colon + L" token, expected ':'";
-            return;
-        }
-
-        if (_tokens.size() < i + 3) {
-            auto semi_colon = _tokens.at(i + 3);
-            if (semi_colon != L";" && semi_colon != L"}") {
-                _error_message = L"Unexpected " + semi_colon + L" token, expected ';' or '}'";
-                return;
-            }
-            i += 3;
-        } else {
-            i += 2;
-        }
-
-        node->set_attr(name, value);
-
-        if (i == _tokens.size() - 1)
+        if (_tokens.size() >= i + 3 && _tokens.at(i + 3) != L";") {
+            _error_message = L"Unecpected token: " + _tokens.at(i + 3);
             break;
+        }
+        ret[name] = value;
     }
-}
 
-css_parser::~css_parser()
-{
-
+    return ret;
 }
 
 

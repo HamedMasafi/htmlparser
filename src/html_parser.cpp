@@ -1,7 +1,9 @@
-#include "htmlparser.h"
-#include "htmltag.h"
+#include "html_parser.h"
+#include "html_node.h"
+#include "query_parser.h"
 #include "string_helper.h"
 
+#include <iostream>
 #include <stack>
 #include <vector>
 #include <wctype.h>
@@ -9,7 +11,7 @@
 
 using namespace std;
 
-html_parser::html_parser() : token_parser()
+html_parser::html_parser() : token_parser(), _root_tag(nullptr)
 {
     _literals.push_back(new literal_t{L">",  L"<",  L"",     true,  true});
     _literals.push_back(new literal_t{L"\"", L"\"", L"\\\"", false, true});
@@ -17,37 +19,34 @@ html_parser::html_parser() : token_parser()
 
     _check_fns.push_back(&iswalpha);
     _check_fns.push_back(&iswdigit);
-
-    ignores.push_back('\r');
-    ignores.push_back('\n');
 }
 
 html_parser::~html_parser()
 {
+    delete _root_tag;
+}
 
+html_tag *html_parser::root_tag() const {
+    return _root_tag;
 }
 
 void html_parser::parse()
 {
-    parse_tokens();
     size_t i = 0;
 
     stack<html_tag*> stack;
     vector<html_tag*> tags;
-    _htmlTag = nullptr;
+    _root_tag = nullptr;
 
     if (_tokens.size() > 3 && _tokens.at(0) == L"<" && _tokens.at(1) == L"!") {
         std::wstring token;
         doctype.clear();
-        i++;
         while (token != L">") {
             token = _tokens.at(++i);
-            if (token == L">")
-                break;
-            if (doctype.size())
-                doctype.append(L" ");
-            doctype.append(token);
+            if (token != L">")
+                doctype.append(token + L" ");
         }
+        ++i;
     }
 
     for (; i < _tokens.size(); ++i) {
@@ -69,7 +68,7 @@ void html_parser::parse()
                 html_tag *tag = parse_tag_begin(_tokens, i);
                 if (tag) {
                     if (!tags.size())
-                        _htmlTag = tag;
+                        _root_tag = tag;
                     if (stack.size()) {
                         tag->set_parent(stack.top());
                         stack.top()->add_child(tag);
@@ -85,9 +84,12 @@ void html_parser::parse()
         token = _tokens.at(i);
         if (token == L">"){
             if (_tokens.size() > i + 1 && _tokens.at(i + 1) != L"<") {
-                text_node *textNode = new text_node;
-                textNode->setText(string_helper::trim_copy(_tokens.at(i + 1)));
-                stack.top()->add_child(textNode);
+                auto text = string_helper::trim_copy(_tokens.at(i + 1));
+                if (any_of(text.begin(), text.end(), &iswalpha)) {
+                    text_node *textNode = new text_node;
+                    textNode->setText(text);
+                    stack.top()->add_child(textNode);
+                }
             }
         }
     }
@@ -95,45 +97,35 @@ void html_parser::parse()
 
 html_tag *html_parser::get_by_id(const wstring &id)
 {
-    vector<html_tag*> ret;
-    int f = 0;
-    search(&ret, _htmlTag, f, [=](html_tag *t, int &) {
-       return t->id() == id;
-    });
-    return ret.size() ? ret.at(0) : nullptr;
-
+    auto tags = query(L"#" + id);
+    if (tags.size())
+        return tags.at(0);
+    else
+        return nullptr;
 }
 
 std::vector<html_tag *> html_parser::get_by_tag_name(const wstring &tag_name)
 {
-    vector<html_tag*> ret;
-    int f = 0;
-    search(&ret, _htmlTag, f, [=](html_tag *t, int &) {
-       return t->name == tag_name;
-    });
-    return ret;
+    return query(tag_name);
 }
 
 std::vector<html_tag *> html_parser::get_by_class_name(const wstring &class_name)
 {
-    vector<html_tag*> ret;
-    int f = 0;
-    search(&ret, _htmlTag, f, [=](html_tag *t, int &) {
-       return t->has_class(class_name);
-    });
-    return ret;
+    return query(L"." + class_name);
+}
+
+std::vector<html_tag *> html_parser::query(const wstring &q)
+{
+    query_parser qp;
+    qp.set_text(q);
+    qp.tag = _root_tag;
+    return qp.search();
 }
 
 wstring html_parser::to_string(print_type type) const
 {
-    return L"<!" + doctype + L">\n" + _htmlTag->outter_html(type);
+    return L"<" + doctype + L">\n" + _root_tag->to_string(type);
 }
-
-wstring html_parser::to_string(html_tag *tag, int level, print_type type) const
-{
-    return L"";
-}
-
 
 html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t &i)
 {
@@ -199,15 +191,4 @@ html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t 
     tag->setHasCloseTag(tokensList.at(i - 2) != L"/");
     i--;
     return tag;
-}
-
-void html_parser::search(std::vector<html_tag *> *tags, html_tag *tag, int &flag, std::function<bool (html_tag *, int &)> callback)
-{
-    if (callback(tag, flag))
-        tags->push_back(tag);
-    for (html_node *node : tag->childs()) {
-        html_tag *t = dynamic_cast<html_tag*>(node);
-        if (t)
-            search(tags, t, flag, callback);
-    }
 }

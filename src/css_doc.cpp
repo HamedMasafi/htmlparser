@@ -1,5 +1,7 @@
-#include "cssrules.h"
+#include "css_doc.h"
+
 #include <algorithm>
+#include <iostream>
 
 css_node::css_node()
 {
@@ -61,4 +63,12 @@ void css_node::set_attr(const std::wstring &name, const std::wstring &value)
 void css_node::add_selector(const std::wstring &name)
 {
     _selectors.push_back(name);
+}
+
+bool css_node::has_selector(const std::wstring &name)
+{
+    return std::any_of(_selectors.begin(), _selectors.end(), [=](std::wstring &s){
+        std::wcout << s << "  <>  " << name << std::endl;
+       return s == name;
+    });
 }

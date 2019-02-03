@@ -2,7 +2,7 @@
 #define HTMLTAG_H
 
 #include "global.h"
-#include "cssrules.h"
+#include "css_doc.h"
 #include <string>
 #include <vector>
 
@@ -16,7 +16,7 @@ public:
     virtual ~html_node();
     html_node *parent() const;
     void set_parent(html_node *parent);
-    virtual std::wstring outter_html(print_type type = print_type::compact)
+    virtual std::wstring outter_html()
     {
         return  L"";
     }
@@ -24,7 +24,8 @@ public:
     {
         return  L"";
     }
-
+//protected:
+    virtual void append(std::wstring &html, const size_t &level) = 0;
 };
 
 class text_node : public html_node
@@ -36,8 +37,11 @@ public:
     text_node();
     std::wstring text() const;
     void setText(const std::wstring &text);
-    std::wstring outter_html(print_type type = print_type::compact);
+    std::wstring outter_html();
     std::wstring inner_text() const;
+
+private:
+    void append(std::wstring &html, const size_t &level) override;
 };
 
 class html_tag : public html_node
@@ -45,10 +49,11 @@ class html_tag : public html_node
 
     std::map<std::wstring, std::wstring> _attributes;
     std::vector<html_node *> _childs;
-    bool _hasCloseTag;
+    bool _has_close_tag;
     css_node *_css;
-    std::vector<std::wstring> _classes;
+
 public:
+    std::vector<std::wstring> _classes;
     std::wstring name;
 
     html_tag();
@@ -63,8 +68,8 @@ public:
 
     virtual void add_child(html_node *child);
 
-    std::wstring outter_html(print_type type = print_type::compact);
-    virtual std::wstring inner_html(print_type type = print_type::compact) const;
+    std::wstring outter_html();
+    virtual std::wstring inner_html() const;
     std::wstring inner_text() const;
 //    std::wstring name() const;
 //    void setName(const std::wstring &name);
@@ -72,7 +77,13 @@ public:
     void setHasCloseTag(bool hasCloseTag);
     std::vector<html_node *> childs() const;
 
-    friend class html_parser;
+    std::wstring to_string(print_type type = print_type::compact);
+
+private:
+    void append(std::wstring &html, const size_t &level) override;
+    void append_begin_tag(std::wstring &html, const size_t &level);
+    void append_inner_html(std::wstring &html, const size_t &level);
+    void append_end_tag(std::wstring &html, const size_t &level);
 };
 
 class style_tag : public html_tag
@@ -82,11 +93,14 @@ public:
     css_doc rules;
     style_tag();
 
-    void add_child(html_node *child) override;
+    void add_child(html_node *child);
 //    css_doc rules() const;
 //    void setRules(const css_doc &rules);
 
-    std::wstring inner_html(print_type type = print_type::compact) const;
+    std::wstring inner_html() const;
+
+private:
+    void append(std::wstring &html, const size_t &level) override;
 };
 
 #endif // HTMLTAG_H

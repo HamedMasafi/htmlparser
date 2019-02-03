@@ -2,6 +2,7 @@
 #define STRING_HELPER_H
 
 #include <string>
+#include <vector>
 
 class string_helper
 {
@@ -17,6 +18,7 @@ public:
     static void tolower(std::wstring &str);
     static void toupper(std::wstring &str);
     static bool replace(std::wstring &str, const std::wstring &from, const std::wstring &to);
+    static std::vector<std::wstring> split(std::wstring str, const wint_t &sep);
 };
 
 #endif // STRING_HELPER_H

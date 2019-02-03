@@ -1,25 +1,89 @@
-#include "cssparser.h"
-#include "cssrules.h"
-#include "htmltag.h"
+#include "css_parser.h"
+#include "css_doc.h"
+#include "html_node.h"
 #include "string_helper.h"
-#include "tokenparser.h"
+#include "token_parser.h"
 
 #include <iostream>
 #include <algorithm>
 
 bool html_tag::hasCloseTag() const
 {
-    return _hasCloseTag;
+    return _has_close_tag;
 }
 
 void html_tag::setHasCloseTag(bool hasCloseTag)
 {
-    _hasCloseTag = hasCloseTag;
+    _has_close_tag = hasCloseTag;
 }
 
 std::vector<html_node *> html_tag::childs() const
 {
     return _childs;
+}
+
+std::wstring html_tag::to_string(print_type type)
+{
+    if (type == print_type::compact)
+        return outter_html();
+
+    std::wstring html;// = L"<" + name;
+//    std::map<std::wstring, std::wstring>::iterator it;
+//    for(it = _attributes.begin(); it != _attributes.end(); ++it)
+//        html.append(L" " + it->first + L"=\"" + it->second + L"\"");
+
+//    if (_has_close_tag)
+//        html.append(L">");
+//    else
+//        html.append(L" />");
+
+//    if (type == print_type::formatted)
+//        html.append(L"\n");
+
+//    html.append(inner_html(type));
+
+//    if (type == print_type::formatted)
+//        html.append(L"\n");
+//    if (_has_close_tag) {
+//        html.append(L"</" + name + L">");
+//        if (type == print_type::formatted)
+//            html.append(L"\n");
+//    }
+
+    append(html, 0);
+
+    return html;
+}
+
+void html_tag::append(std::wstring &html, const size_t &level)
+{
+    append_begin_tag(html, level);
+    append_inner_html(html, level);
+    append_end_tag(html, level);
+}
+
+void html_tag::append_begin_tag(std::wstring &html, const size_t &level)
+{
+    html.append(std::wstring(level * 4, ' '));
+
+    html.append(L"<" + name);
+    std::map<std::wstring, std::wstring>::iterator it;
+    for(it = _attributes.begin(); it != _attributes.end(); ++it)
+        html.append(L" " + it->first + L"=\"" + it->second + L"\"");
+
+    html.append(L">\n");
+}
+
+void html_tag::append_inner_html(std::wstring &html, const size_t &level)
+{
+    for (auto child : _childs)
+        child->append(html, level + 1);
+}
+
+void html_tag::append_end_tag(std::wstring &html, const size_t &level)
+{
+    html.append(std::wstring(level * 4, ' '));
+    html.append(L"</" + name + L">\n");
 }
 
 html_tag::html_tag() : html_node (), _css(new css_node)
@@ -50,15 +114,14 @@ void html_tag::set_attr(const std::wstring &name, const std::wstring &value)
     //TODO: parse css
     if (n == L"style") {
         css_parser p;
-        p.setText(value);
-        p.parse_tokens();
-        size_t i = 0;
-        p.parse_rules(_css, i);
+        p.set_text(value);
+        auto rules = p.parse_block();
+        _attributes = rules;
     } else if (n == L"class") {
-//        _classes = value.split(" ");
+        _classes = string_helper::split(value, ' ');
     }
 
-    _attributes[name] = value;
+    _attributes[n] = value;
 }
 
 void html_tag::add_class(const std::wstring &name)
@@ -85,40 +148,32 @@ void html_tag::add_child(html_node *child)
 }
 
 
-std::wstring html_tag::outter_html(print_type type)
+std::wstring html_tag::outter_html()
 {
     std::wstring html = L"<" + name;
     std::map<std::wstring, std::wstring>::iterator it;
     for(it = _attributes.begin(); it != _attributes.end(); ++it)
         html.append(L" " + it->first + L"=\"" + it->second + L"\"");
 
-    if (_hasCloseTag)
+    if (_has_close_tag)
         html.append(L">");
     else
         html.append(L" />");
 
-    if (type == print_type::formatted)
-        html.append(L"\n");
+    html.append(inner_html());
 
-    html.append(inner_html(type));
-
-    if (type == print_type::formatted)
-        html.append(L"\n");
-    if (_hasCloseTag) {
+    if (_has_close_tag)
         html.append(L"</" + name + L">");
-        if (type == print_type::formatted)
-            html.append(L"\n");
-    }
 
     return html;
 }
 
-std::wstring html_tag::inner_html(print_type type) const
+std::wstring html_tag::inner_html() const
 {
     std::wstring html;
     std::vector<html_node*>::const_iterator i;
     for (i = _childs.cbegin(); i != _childs.cend(); ++i)
-        html.append((*i)->outter_html(type));
+        html.append((*i)->outter_html());
 
     return html;
 }
@@ -173,12 +228,11 @@ std::wstring text_node::text() const
 void text_node::setText(const std::wstring &text)
 {
     _text = text;
-    string_helper::replace(_text, L"\r", L" ");
-    string_helper::replace(_text, L"\n", L" ");
-    std::wcout << L"transformed: " << _text;
+    string_helper::replace(_text, L"\r", L"");
+    string_helper::replace(_text, L"\n", L"");
 }
 
-std::wstring text_node::outter_html(print_type type)
+std::wstring text_node::outter_html()
 {
     return _text;
 }
@@ -186,6 +240,11 @@ std::wstring text_node::outter_html(print_type type)
 std::wstring text_node::inner_text() const
 {
     return  _text;
+}
+
+void text_node::append(std::wstring &html, const size_t &level)
+{
+    html.append(std::wstring(level * 4, ' ') + _text + L"\n");
 }
 
 //css_doc style_tag::rules() const
@@ -198,12 +257,21 @@ std::wstring text_node::inner_text() const
 //    _rules = rules;
 //}
 
-std::wstring style_tag::inner_html(print_type type) const
+std::wstring style_tag::inner_html() const
 {
     if (rules.size())
-        return rules.to_string(type);
-    else
         return std::wstring();
+    else
+        return rules.to_string();
+}
+
+void style_tag::append(std::wstring &html, const size_t &level)
+{
+    if (rules.size())
+        for (auto i = rules.cbegin(); i != rules.cend(); ++i)
+            html.append(std::wstring(level * 4, ' ')
+                        + (*i)->to_string(print_type::formatted)
+                        + L"\n");
 }
 
 style_tag::style_tag() : html_tag()
@@ -216,10 +284,8 @@ void style_tag::add_child(html_node *child)
     text_node *tn = dynamic_cast<text_node*>(child);
     if (tn) {
         css_parser cp;
-        cp.setText(tn->text());
-        cp.parse();
+        cp.set_text(tn->text());
         rules = cp.doc;
-        std::wcout << L"new css" << cp.doc.to_string() << rules.size() << L">>>";
     } else {
         std::cout << "Appending non-text node to style tag was not allowed";
     }
