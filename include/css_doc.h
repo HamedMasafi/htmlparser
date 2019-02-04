@@ -22,6 +22,9 @@ public:
     }
     std::wstring to_string(print_type type = print_type::compact) const;
     void append(string_renderer &r);
+    void inline_append(string_renderer &r);
+
+    friend class html_tag;
 };
 
 class css_doc : public std::vector<css_node*>

@@ -26,6 +26,8 @@ public:
     void indent();
     void unindent();
     std::wstring to_string() const;
+    print_type type() const;
+    void set_type(const print_type &type);
 };
 
 #endif // STRING_RENDERER_H

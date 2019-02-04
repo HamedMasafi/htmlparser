@@ -1,6 +1,7 @@
 #include "string_renderer.h"
 
 #define INDENT_SIZE 4
+
 string_renderer::string_renderer(print_type type) : _type(type), _level(0), _last_action(last_action::etc)
 {
 
@@ -22,8 +23,8 @@ void string_renderer::new_line()
 {
     if (_last_action == last_action::new_line)
         return;
-    _last_action = last_action::new_line;
     if (_type == print_type::formatted) {
+        _last_action = last_action::new_line;
         _buffer.append(L"\n");
         for (unsigned long i = 0; i < INDENT_SIZE * _level; ++i)
             _buffer.append(L" ");
@@ -34,9 +35,10 @@ void string_renderer::space()
 {
     if (_last_action == last_action::space)
         return;
-    _last_action = last_action::space;
-    if (_type == print_type::formatted)
+    if (_type == print_type::formatted) {
+        _last_action = last_action::space;
         _buffer.append(L" ");
+    }
 }
 
 void string_renderer::indent()
@@ -59,4 +61,14 @@ void string_renderer::unindent()
 std::wstring string_renderer::to_string() const
 {
     return _buffer;
+}
+
+print_type string_renderer::type() const
+{
+    return _type;
+}
+
+void string_renderer::set_type(const print_type &type)
+{
+    _type = type;
 }

@@ -72,14 +72,17 @@ TEST_CASE( "Init", "[init]" ) {
     init_test();
 }
 TEST_CASE("String", "[string]") {
-    print("HTML Formatted", html.root_tag()->to_string(print_type::formatted));
-    print("HTML Compact", html.root_tag()->to_string(print_type::compact));
+    print("HTML Formatted", html.to_string(print_type::formatted));
+    print("HTML Compact", html.to_string(print_type::compact));
     print("CSS compact", css.to_string(print_type::compact));
     print("CSS formatted", css.to_string(print_type::formatted));
 }
 
 TEST_CASE("Html", "[html]"){
     auto tags = html.query(L"p.par b");
+    std::for_each(tags.begin(), tags.end(), [](html_tag *tag){
+       tag->add_class(L"new-class");
+    });
     REQUIRE(1 == tags.size());
 }
 

@@ -63,6 +63,7 @@ public:
 
     std::wstring id();
     std::wstring attr(const std::wstring &name);
+    std::wstring data(const std::wstring &name);
     void set_attr(const std::wstring &name, const std::wstring &value);
     void add_class(const std::wstring &name);
     void remove_class(const std::wstring &name);
@@ -86,6 +87,8 @@ private:
     void append_begin_tag(string_renderer &r);
     void append_inner_html(string_renderer &r);
     void append_end_tag(string_renderer &r);
+
+    friend class html_parser;
 };
 
 class style_tag : public html_tag

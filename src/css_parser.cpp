@@ -1,6 +1,7 @@
 #include "css_parser.h"
 #include "string_renderer.h"
 #include <wctype.h>
+#include <iostream>
 
 std::vector<css_node *> css_parser::nodes() const
 {
@@ -78,18 +79,21 @@ std::map<std::wstring, std::wstring> css_parser::parse_block()
 {
     size_t i = 0;
     std::map<std::wstring, std::wstring> ret;
+    std::wcout << L"css count:" << _tokens.size() << std::endl;
     while (true) {
-        if (_tokens.size() > i + 3)
+        if (_tokens.size() < i + 3)
             break;
         auto name = _tokens.at(i);
         auto colon = _tokens.at(i + 1);
         auto value = _tokens.at(i + 2);
 
+        std::wcout << std::endl << name << colon << value << std::endl;
         if (_tokens.size() >= i + 3 && _tokens.at(i + 3) != L";") {
             _error_message = L"Unecpected token: " + _tokens.at(i + 3);
             break;
         }
         ret[name] = value;
+        i += 4;
     }
 
     return ret;

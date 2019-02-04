@@ -68,6 +68,16 @@ void css_node::append(string_renderer &r)
     r.new_line();
 }
 
+void css_node::inline_append(string_renderer &r)
+{
+    for (auto it = _rules.begin(); it != _rules.end(); ++it) {
+        r.append(it->first);
+        r.append(L":");
+        r.append(it->second);
+        r.append(L";");
+    }
+}
+
 std::wstring css_doc::to_string(print_type type) const
 {
     string_renderer r(type);

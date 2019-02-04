@@ -51,6 +51,24 @@ void html_tag::append_begin_tag(string_renderer &r)
     for(it = _attributes.begin(); it != _attributes.end(); ++it)
         r.append(L" " + it->first + L"=\"" + it->second + L"\"");
 
+    if (_css->_rules.size()) {
+        r.space();
+        r.append(L"style=\"");
+        _css->inline_append(r);
+        r.append(L"\"");
+    }
+
+    if (_classes.size()) {
+        r.space();
+        r.append(L"class=\"");
+        for (size_t i = 0; i < _classes.size(); i++) {
+            if (i)
+                r.space();
+            r.append(_classes.at(i));
+        }
+        r.append(L"\"");
+    }
+
     if (_has_close_tag)
         r.append(L">");
     else
@@ -92,18 +110,25 @@ std::wstring html_tag::attr(const std::wstring &name)
     return _attributes[name];
 }
 
+std::wstring html_tag::data(const std::wstring &name)
+{
+    return attr(L"data-" + name);
+}
+
 void html_tag::set_attr(const std::wstring &name, const std::wstring &value)
 {
     auto n = name;
     string_helper::tolower(n);
-    //TODO: parse css
     if (n == L"style") {
         css_parser p;
         p.set_text(value);
         auto rules = p.parse_block();
-        _attributes = rules;
+        _css->_rules = rules;
+        return;
+
     } else if (n == L"class") {
         _classes = string_helper::split(value, ' ');
+        return;
     }
 
     _attributes[n] = value;
@@ -111,7 +136,7 @@ void html_tag::set_attr(const std::wstring &name, const std::wstring &value)
 
 void html_tag::add_class(const std::wstring &name)
 {
-    if (std::find(_classes.begin(), _classes.end(), name) != _classes.end())
+    if (std::find(_classes.begin(), _classes.end(), name) == _classes.end())
         _classes.push_back(name);
 }
 

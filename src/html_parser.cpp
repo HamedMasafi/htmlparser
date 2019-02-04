@@ -7,6 +7,7 @@
 #include <vector>
 #include <wctype.h>
 #include <algorithm>
+#include <string_renderer.h>
 
 using namespace std;
 
@@ -123,7 +124,14 @@ std::vector<html_tag *> html_parser::query(const wstring &q)
 
 wstring html_parser::to_string(print_type type) const
 {
-    return L"<" + doctype + L">\n" + _root_tag->to_string(type);
+    string_renderer r(type);
+
+    if (doctype.size()) {
+        r.append(L"<" + doctype + L">");
+        r.new_line();
+    }
+    _root_tag->append(r);
+    return r.to_string();
 }
 
 html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t &i)
