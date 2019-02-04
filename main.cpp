@@ -12,22 +12,22 @@
 
 static html_parser html;
 static css_parser css;
-void print(std::vector<std::wstring> tokens){
+void print(std::vector<std::string> tokens){
     std::cout << "==== TOKENS ====" << std::endl;
-    for (std::wstring t : tokens) {
-        std::wcout << L"\"" << t << L"\" ";
+    for (std::string t : tokens) {
+        std::cout << "\"" << t << "\" ";
     }
-    std::wcout << "================" << std::endl;
+    std::cout << "================" << std::endl;
 }
 
-void print(std::string title, std::wstring text){
+void print(std::string title, std::string text){
     std::cout << "==== " + title + " ====" << std::endl;
-    std::wcout << text << std::endl;
+    std::cout << text << std::endl;
     std::cout << "================" << std::endl;
 };
 
 void init_test() {
-    auto html_text = LR"~(<!DOCTYPE HTML>
+    auto html_text = R"~(<!DOCTYPE HTML>
                      <html>
                      <head>
                      <meta name="qrichtext" content="1" />
@@ -46,7 +46,7 @@ void init_test() {
                      </body>
                      </html>)~";
 
-    auto css_text = LR"~(
+    auto css_text = R"~(
                     body{
                     color: red;
                     background-color: green;
@@ -78,18 +78,18 @@ TEST_CASE("String", "[string]") {
     print("CSS formatted", css.to_string(print_type::formatted));
 }
 
-TEST_CASE("Html", "[html]"){
-    auto tags = html.query(L"p.par b");
+TEST_CASE("Htm", "[html]"){
+    auto tags = html.query("p.par b");
     std::for_each(tags.begin(), tags.end(), [](html_tag *tag){
-       tag->add_class(L"new-class");
+       tag->add_class("new-class");
     });
     REQUIRE(1 == tags.size());
 }
 
 TEST_CASE("CSS Rules", "[css]") {
     REQUIRE(4 == css.nodes().size());
-    REQUIRE(1 == css.find_match_selector(L"body").size());
-    REQUIRE(2 == css.find_contains_selector(L".p").size());
+    REQUIRE(1 == css.find_match_selector("body").size());
+    REQUIRE(2 == css.find_contains_selector(".p").size());
 }
 
 

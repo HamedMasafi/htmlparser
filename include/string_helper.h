@@ -8,17 +8,17 @@ class string_helper
 {
 public:
     string_helper();
-    static std::wstring trim_copy(std::wstring s);
-    static std::wstring rtrim_copy(std::wstring s);
-    static std::wstring ltrim_copy(std::wstring s);
-    static void trim(std::wstring &s);
-    static void rtrim(std::wstring &s);
-    static void ltrim(std::wstring &s);
+    static std::string trim_copy(std::string s);
+    static std::string rtrim_copy(std::string s);
+    static std::string ltrim_copy(std::string s);
+    static void trim(std::string &s);
+    static void rtrim(std::string &s);
+    static void ltrim(std::string &s);
 
-    static void tolower(std::wstring &str);
-    static void toupper(std::wstring &str);
-    static bool replace(std::wstring &str, const std::wstring &from, const std::wstring &to);
-    static std::vector<std::wstring> split(std::wstring str, const wint_t &sep);
+    static void tolower(std::string &str);
+    static void toupper(std::string &str);
+    static bool replace(std::string &str, const std::string &from, const std::string &to);
+    static std::vector<std::string> split(std::string str, const char &sep);
 };
 
 #endif // STRING_HELPER_H

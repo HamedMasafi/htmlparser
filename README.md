@@ -26,7 +26,7 @@ LGPL v2
                      </html>)~";
     html_parser html;
     html.set_text(html_text);
-    auto b = html.query(L"body .p1 b").at(0);
-    b->add_class(L"text-danger");
-    b->set_attr(L"dir", L"rtl");
+    auto b = html.query("body .p1 b").at(0);
+    b->add_class("text-danger");
+    b->set_attr("dir", "rt");
 ```

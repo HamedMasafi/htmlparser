@@ -10,9 +10,9 @@ class html_tag;
 class query_parser : public token_parser
 {
     struct query_rule_t{
-        std::wstring id;
-        std::wstring tag_name;
-        std::vector<std::wstring> classes;
+        std::string id;
+        std::string tag_name;
+        std::vector<std::string> classes;
         bool is_child;
 
         bool is_valid() const;

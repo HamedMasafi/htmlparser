@@ -13,12 +13,12 @@ using namespace std;
 
 html_parser::html_parser() : token_parser(), _root_tag(nullptr)
 {
-    _literals.push_back(new literal_t{L">",  L"<",  L"",     true,  true});
-    _literals.push_back(new literal_t{L"\"", L"\"", L"\\\"", false, true});
-    _literals.push_back(new literal_t{L"'",  L"'",  L"\\'",  false, true});
+    _literals.push_back(new literal_t{">",  "<",  "",     true,  true});
+    _literals.push_back(new literal_t{"\"", "\"", "\\\"", false, true});
+    _literals.push_back(new literal_t{"'",  "'",  "\\'",  false, true});
 
-    _check_fns.push_back(&iswalpha);
-    _check_fns.push_back(&iswdigit);
+    _check_fns.push_back(&isalpha);
+    _check_fns.push_back(&isdigit);
 }
 
 html_parser::~html_parser()
@@ -38,31 +38,31 @@ void html_parser::parse()
     vector<html_tag*> tags;
     _root_tag = nullptr;
 
-    if (_tokens.size() > 3 && _tokens.at(0) == L"<" && _tokens.at(1) == L"!") {
-        std::wstring token;
+    if (_tokens.size() > 3 && _tokens.at(0) == "<" && _tokens.at(1) == "!") {
+        std::string token;
         doctype.clear();
-        while (token != L">") {
+        while (token != ">") {
             token = _tokens.at(++i);
-            if (token != L">")
-                doctype.append(token + L" ");
+            if (token != ">")
+                doctype.append(token + " ");
         }
         ++i;
     }
 
     for (; i < _tokens.size(); ++i) {
-        wstring token = _tokens.at(i);
+        string token = _tokens.at(i);
 
         if (all_of(token.begin(), token.end(),
-                   [](wint_t n){return !iswprint(n);}))
+                   [](char n){return !iswprint(n);}))
             continue;
 
-        if (token == L"<") {
+        if (token == "<") {
             if (_tokens.size() <= i + 1) {
-                _error_message = L"Unexpected end of document";
+                _error_message = "Unexpected end of document";
                 return;
             }
 
-            if (_tokens.at(i + 1) == L"/") {
+            if (_tokens.at(i + 1) == "/") {
                 stack.pop();
             } else {
                 html_tag *tag = parse_tag_begin(_tokens, i);
@@ -82,8 +82,8 @@ void html_parser::parse()
         }
 
         token = _tokens.at(i);
-        if (token == L">"){
-            if (_tokens.size() > i + 1 && _tokens.at(i + 1) != L"<") {
+        if (token == ">"){
+            if (_tokens.size() > i + 1 && _tokens.at(i + 1) != "<") {
                 auto text = string_helper::trim_copy(_tokens.at(i + 1));
                 if (any_of(text.begin(), text.end(), &iswalpha)) {
                     text_node *textNode = new text_node;
@@ -95,26 +95,26 @@ void html_parser::parse()
     }
 }
 
-html_tag *html_parser::get_by_id(const wstring &id)
+html_tag *html_parser::get_by_id(const string &id)
 {
-    auto tags = query(L"#" + id);
+    auto tags = query("#" + id);
     if (tags.size())
         return tags.at(0);
     else
         return nullptr;
 }
 
-std::vector<html_tag *> html_parser::get_by_tag_name(const wstring &tag_name)
+std::vector<html_tag *> html_parser::get_by_tag_name(const string &tag_name)
 {
     return query(tag_name);
 }
 
-std::vector<html_tag *> html_parser::get_by_class_name(const wstring &class_name)
+std::vector<html_tag *> html_parser::get_by_class_name(const string &class_name)
 {
-    return query(L"." + class_name);
+    return query("." + class_name);
 }
 
-std::vector<html_tag *> html_parser::query(const wstring &q)
+std::vector<html_tag *> html_parser::query(const string &q)
 {
     query_parser qp;
     qp.set_text(q);
@@ -122,32 +122,32 @@ std::vector<html_tag *> html_parser::query(const wstring &q)
     return qp.search();
 }
 
-wstring html_parser::to_string(print_type type) const
+string html_parser::to_string(print_type type) const
 {
     string_renderer r(type);
 
     if (doctype.size()) {
-        r.append(L"<" + doctype + L">");
+        r.append("<" + doctype + ">");
         r.new_line();
     }
     _root_tag->append(r);
     return r.to_string();
 }
 
-html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t &i)
+html_tag *html_parser::parse_tag_begin(std::vector<string> &tokensList, size_t &i)
 {
     html_tag *tag;
-    wstring token;
+    string token;
     i++;
     auto tag_name = tokensList.at(i++);
-    if (tag_name == L"style")
+    if (tag_name == "style")
         tag = new style_tag;
     else
         tag = new html_tag;
 
     tag->name = tag_name;
-//    map<wstring, wstring> attrs;
-    wstring name, value;
+//    map<string, string> attrs;
+    string name, value;
     int step = 0;
     /*
 
@@ -158,16 +158,16 @@ html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t 
      "
 
      */
-    if (tokensList.at(i) != L">")
+    if (tokensList.at(i) != ">")
         do {
         if (i == tokensList.size()) {
-            _error_message = L"Unexpected end of document";
+            _error_message = "Unexpected end of document";
             delete tag;
             return nullptr;
         }
         token = tokensList.at(i++);
 
-        if (token == L">")
+        if (token == ">")
             break;
 
         switch (step) {
@@ -177,10 +177,10 @@ html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t 
             break;
 
         case 1:
-            if (token == L"=")
+            if (token == "=")
                 step++;
             else {
-                _error_message = L"Unexpected " + token + L" token";
+                _error_message = "Unexpected " + token + " token";
                         //<< "error; token is" << token << "in" << step << "step for" << tag->name;
                 delete tag;
                 return nullptr;
@@ -193,9 +193,9 @@ html_tag *html_parser::parse_tag_begin(std::vector<wstring> &tokensList, size_t 
             tag->set_attr(name, value);
             break;
         }
-    } while (token != L">");
+    } while (token != ">");
 
-    tag->setHasCloseTag(tokensList.at(i - 2) != L"/");
+    tag->setHasCloseTag(tokensList.at(i - 2) != "/");
     i--;
     return tag;
 }

@@ -6,7 +6,7 @@
 
 class string_renderer
 {
-    std::wstring _buffer;
+    std::string _buffer;
     print_type _type;
     size_t _level;
 
@@ -19,13 +19,13 @@ class string_renderer
 
 public:
     string_renderer(print_type type);
-    void append(const std::wstring &buffer);
-    void append(const std::wstring &&buffer);
+    void append(const std::string &buffer);
+    void append(const std::string &&buffer);
     void new_line();
     void space();
     void indent();
     void unindent();
-    std::wstring to_string() const;
+    std::string to_string() const;
     print_type type() const;
     void set_type(const print_type &type);
 };

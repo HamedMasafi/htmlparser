@@ -17,7 +17,7 @@ void query_parser::parse()
     std::vector<query_rule_t*> rl;
     for (size_t i = 0; i < _tokens.size(); ++i) {
         auto t = _tokens.at(i);
-        if (t == L",") {
+        if (t == ",") {
             rl.push_back(last_rule);
             rules.push_back(rl);
             rl.clear();
@@ -25,17 +25,17 @@ void query_parser::parse()
             continue;
         }
 
-        if (t == L".") {
+        if (t == ".") {
             ++i;
             last_rule->classes.push_back(_tokens.at(i));
             continue;
         }
-        if (t == L"#") {
+        if (t == "#") {
             ++i;
             last_rule->id = _tokens.at(i);
             continue;
         }
-        if (t == L">") {
+        if (t == ">") {
             rl.push_back(last_rule);
             last_rule = new query_rule_t;
             last_rule->is_child = true;
@@ -98,7 +98,7 @@ bool query_parser::query_rule_t::check(html_tag *tag) const
 
     if (classes.size())
         for (auto cls : classes) {
-            if (std::none_of(tag->_classes.begin(), tag->_classes.end(), [=](std::wstring c){
+            if (std::none_of(tag->_classes.begin(), tag->_classes.end(), [=](std::string c){
                 return c == cls;
             })){
                 return false;

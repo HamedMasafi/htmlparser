@@ -7,13 +7,13 @@ string_renderer::string_renderer(print_type type) : _type(type), _level(0), _las
 
 }
 
-void string_renderer::append(const std::wstring &buffer)
+void string_renderer::append(const std::string &buffer)
 {
     _last_action = last_action::etc;
     _buffer.append(buffer);
 }
 
-void string_renderer::append(const std::wstring &&buffer)
+void string_renderer::append(const std::string &&buffer)
 {
     _last_action = last_action::etc;
     _buffer.append(buffer);
@@ -25,9 +25,9 @@ void string_renderer::new_line()
         return;
     if (_type == print_type::formatted) {
         _last_action = last_action::new_line;
-        _buffer.append(L"\n");
+        _buffer.append("\n");
         for (unsigned long i = 0; i < INDENT_SIZE * _level; ++i)
-            _buffer.append(L" ");
+            _buffer.append(" ");
     }
 }
 
@@ -37,7 +37,7 @@ void string_renderer::space()
         return;
     if (_type == print_type::formatted) {
         _last_action = last_action::space;
-        _buffer.append(L" ");
+        _buffer.append(" ");
     }
 }
 
@@ -47,7 +47,7 @@ void string_renderer::indent()
 
     if (_last_action == last_action::new_line)
         for (unsigned long i = 0; i < INDENT_SIZE; ++i)
-            _buffer.append(L" ");
+            _buffer.append(" ");
 }
 
 void string_renderer::unindent()
@@ -58,7 +58,7 @@ void string_renderer::unindent()
         _buffer.erase(_buffer.end() - INDENT_SIZE, _buffer.end());
 }
 
-std::wstring string_renderer::to_string() const
+std::string string_renderer::to_string() const
 {
     return _buffer;
 }

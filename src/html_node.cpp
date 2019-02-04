@@ -23,7 +23,7 @@ std::vector<html_node *> html_tag::childs() const
     return _childs;
 }
 
-std::wstring html_tag::to_string(print_type type)
+std::string html_tag::to_string(print_type type)
 {
     string_renderer r(type);
     append(r);
@@ -46,33 +46,33 @@ void html_tag::append(string_renderer &r)
 
 void html_tag::append_begin_tag(string_renderer &r)
 {
-    r.append(L"<" + name);
-    std::map<std::wstring, std::wstring>::iterator it;
+    r.append("<" + name);
+    std::map<std::string, std::string>::iterator it;
     for(it = _attributes.begin(); it != _attributes.end(); ++it)
-        r.append(L" " + it->first + L"=\"" + it->second + L"\"");
+        r.append(" " + it->first + "=\"" + it->second + "\"");
 
     if (_css->_rules.size()) {
         r.space();
-        r.append(L"style=\"");
+        r.append("style=\"");
         _css->inline_append(r);
-        r.append(L"\"");
+        r.append("\"");
     }
 
     if (_classes.size()) {
         r.space();
-        r.append(L"class=\"");
+        r.append("class=\"");
         for (size_t i = 0; i < _classes.size(); i++) {
             if (i)
                 r.space();
             r.append(_classes.at(i));
         }
-        r.append(L"\"");
+        r.append("\"");
     }
 
     if (_has_close_tag)
-        r.append(L">");
+        r.append(">");
     else
-        r.append(L" />");
+        r.append(" />");
 }
 
 void html_tag::append_inner_html(string_renderer &r)
@@ -85,7 +85,7 @@ void html_tag::append_end_tag(string_renderer &r)
 {
     if (_has_close_tag) {
         r.new_line();
-        r.append(L"</" + name + L">");
+        r.append("</" + name + ">");
     }
 }
 
@@ -100,33 +100,33 @@ html_tag::~html_tag()
         delete child;
 }
 
-std::wstring html_tag::id()
+std::string html_tag::id()
 {
-    return _attributes[L"id"];
+    return _attributes["id"];
 }
 
-std::wstring html_tag::attr(const std::wstring &name)
+std::string html_tag::attr(const std::string &name)
 {
     return _attributes[name];
 }
 
-std::wstring html_tag::data(const std::wstring &name)
+std::string html_tag::data(const std::string &name)
 {
-    return attr(L"data-" + name);
+    return attr("data-" + name);
 }
 
-void html_tag::set_attr(const std::wstring &name, const std::wstring &value)
+void html_tag::set_attr(const std::string &name, const std::string &value)
 {
     auto n = name;
     string_helper::tolower(n);
-    if (n == L"style") {
+    if (n == "style") {
         css_parser p;
         p.set_text(value);
         auto rules = p.parse_block();
         _css->_rules = rules;
         return;
 
-    } else if (n == L"class") {
+    } else if (n == "class") {
         _classes = string_helper::split(value, ' ');
         return;
     }
@@ -134,19 +134,19 @@ void html_tag::set_attr(const std::wstring &name, const std::wstring &value)
     _attributes[n] = value;
 }
 
-void html_tag::add_class(const std::wstring &name)
+void html_tag::add_class(const std::string &name)
 {
     if (std::find(_classes.begin(), _classes.end(), name) == _classes.end())
         _classes.push_back(name);
 }
 
-void html_tag::remove_class(const std::wstring &name)
+void html_tag::remove_class(const std::string &name)
 {
     _classes.erase(std::remove(_classes.begin(), _classes.end(), name),
                    _classes.end());
 }
 
-bool html_tag::has_class(const std::wstring &name) const
+bool html_tag::has_class(const std::string &name) const
 {
     return (std::find(_classes.begin(), _classes.end(), name) != _classes.end());
 }
@@ -158,29 +158,29 @@ void html_tag::add_child(html_node *child)
 }
 
 
-std::wstring html_tag::outter_html()
+std::string html_tag::outter_html()
 {
-    std::wstring html = L"<" + name;
-    std::map<std::wstring, std::wstring>::iterator it;
+    std::string html = "<" + name;
+    std::map<std::string, std::string>::iterator it;
     for(it = _attributes.begin(); it != _attributes.end(); ++it)
-        html.append(L" " + it->first + L"=\"" + it->second + L"\"");
+        html.append(" " + it->first + "=\"" + it->second + "\"");
 
     if (_has_close_tag)
-        html.append(L">");
+        html.append(">");
     else
-        html.append(L" />");
+        html.append(" />");
 
     html.append(inner_html());
 
     if (_has_close_tag)
-        html.append(L"</" + name + L">");
+        html.append("</" + name + ">");
 
     return html;
 }
 
-std::wstring html_tag::inner_html() const
+std::string html_tag::inner_html() const
 {
-    std::wstring html;
+    std::string html;
     std::vector<html_node*>::const_iterator i;
     for (i = _childs.cbegin(); i != _childs.cend(); ++i)
         html.append((*i)->outter_html());
@@ -188,16 +188,16 @@ std::wstring html_tag::inner_html() const
     return html;
 }
 
-std::wstring html_tag::inner_text() const
+std::string html_tag::inner_text() const
 {
-    std::wstring html;
+    std::string html;
     std::vector<html_node*>::const_iterator i;
     for (i = _childs.cbegin(); i != _childs.cend(); ++i) {
-        std::wstring buffer = (*i)->inner_text();
+        std::string buffer = (*i)->inner_text();
 //        trim(buffer);
-        if (buffer != L"") {
-            if (buffer.substr(buffer.length() - 1, 1) != L" ")
-                buffer.append(L" ");
+        if (buffer != "") {
+            if (buffer.substr(buffer.length() - 1, 1) != " ")
+                buffer.append(" ");
             html.append(buffer);
         }
     }
@@ -230,24 +230,24 @@ text_node::text_node() : html_node ()
 
 }
 
-std::wstring text_node::text() const
+std::string text_node::text() const
 {
     return _text;
 }
 
-void text_node::setText(const std::wstring &text)
+void text_node::setText(const std::string &text)
 {
     _text = text;
-    string_helper::replace(_text, L"\r", L"");
-    string_helper::replace(_text, L"\n", L"");
+    string_helper::replace(_text, "\r", "");
+    string_helper::replace(_text, "\n", "");
 }
 
-std::wstring text_node::outter_html()
+std::string text_node::outter_html()
 {
     return _text;
 }
 
-std::wstring text_node::inner_text() const
+std::string text_node::inner_text() const
 {
     return  _text;
 }
@@ -267,17 +267,17 @@ void text_node::append(string_renderer &r)
 //    _rules = rules;
 //}
 
-std::wstring style_tag::inner_html() const
+std::string style_tag::inner_html() const
 {
     if (rules.nodes().size())
-        return std::wstring();
+        return std::string();
     else
         return rules.to_string();
 }
 
 void style_tag::append(string_renderer &r)
 {
-    r.append(L"<style>");
+    r.append("<style>");
     r.indent();
     r.new_line();
     auto nodes = rules.nodes();
@@ -287,7 +287,7 @@ void style_tag::append(string_renderer &r)
             r.new_line();
         }
     r.unindent();
-    r.append(L"</style>");
+    r.append("</style>");
     r.new_line();
 }
 

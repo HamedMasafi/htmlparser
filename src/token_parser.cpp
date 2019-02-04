@@ -20,36 +20,36 @@ token_parser::~token_parser()
 
 }
 
-std::wstring token_parser::text() const
+std::string token_parser::text() const
 {
     return _text;
 }
 
-void token_parser::set_text(const std::wstring &text)
+void token_parser::set_text(const std::string &text)
 {
     _text = text;
     parse_tokens();
     parse();
 }
 
-std::vector<std::wstring> token_parser::tokens() const
+std::vector<std::string> token_parser::tokens() const
 {
     return _tokens;
 }
 
-std::vector<std::wstring> token_parser::parse_tokens()
+std::vector<std::string> token_parser::parse_tokens()
 {
     _tokens.clear();
     for (std::size_t i = 0; i < _text.length(); ++i) {
-        std::wstring last_token;
-        auto ch = static_cast<wint_t>(_text.at(i));
+        std::string last_token;
+        auto ch = static_cast<char>(_text.at(i));
 
-        if (iswcntrl(ch) || iswspace(ch) || iswblank(ch) || ch == '\n' || ch == '\r')
+        if (iscntrl(ch) || isspace(ch) || isblank(ch) || ch == '\n' || ch == '\r')
             continue;
 
         bool outer_continue = false;
         for (literal_t *literal : _literals) {
-            wstring st = _text.substr(i, literal->begin.length());
+            string st = _text.substr(i, literal->begin.length());
             if (st == literal->begin) {
                 last_token = read_until(_text, i, literal);
 
@@ -83,7 +83,7 @@ std::vector<std::wstring> token_parser::parse_tokens()
         if (outer_continue)
             continue;
 
-        if (iswpunct(ch)) {
+        if (ispunct(ch)) {
             _tokens.push_back(_text.substr(i, 1));
         }
     }
@@ -91,7 +91,7 @@ std::vector<std::wstring> token_parser::parse_tokens()
     return _tokens;
 }
 
-wstring token_parser::read_until(const wstring &text, size_t &i, std::function<int (int)> fn) const
+string token_parser::read_until(const string &text, size_t &i, std::function<int (int)> fn) const
 {
     size_t start = i;
     while (text.length() > i  && fn(text.at(i))) {
@@ -100,32 +100,32 @@ wstring token_parser::read_until(const wstring &text, size_t &i, std::function<i
     return text.substr(start, i - start);
 }
 
-wstring token_parser::read_until(const wstring &text, size_t &i, const literal_t *lt) const
+string token_parser::read_until(const string &text, size_t &i, const literal_t *lt) const
 {
     auto start = i;
     while (i < text.length() - lt->end.length()) {
         if (text.length() < i + lt->end.length())
-            return wstring();
+            return string();
 
         auto s = text.substr(++i, lt->end.length());
         if (s == lt->end)
             break;
     }
     if (i == start)
-        return wstring();
+        return string();
     i += lt->end.length() - 1;
     start += lt->begin.length();
 
     return text.substr(start, i - start - lt->end.length() + 1);
 }
 
-bool token_parser::is_valid_token(const wstring &token) const
+bool token_parser::is_valid_token(const string &token) const
 {
     if (!token.length())
         return false;
 
-    return any_of(token.begin(), token.end(), [](wint_t ch){
-        return iswprint(ch);
+    return any_of(token.begin(), token.end(), [](char ch){
+        return isprint(ch);
     });
 }
 
