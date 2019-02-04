@@ -6,7 +6,7 @@ LGPL v2
 
 ## Sample usage
 ```cpp
-    auto html_text = LR"~(<!DOCTYPE HTML>
+    auto html_text = R"~(<!DOCTYPE HTML>
                      <html>
                      <head>
                      <meta name="qrichtext" content="1" />
