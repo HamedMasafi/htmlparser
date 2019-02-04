@@ -1,14 +1,15 @@
 #include <iostream>
 #include <algorithm>
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include "include/token_parser.h"
 #include "include/css_parser.h"
 #include "include/html_parser.h"
 #include "include/html_node.h"
 #include "include/query_parser.h"
+
+#define ASSERT(T) \
+    if (!(T)) \
+    std::cout << "Assert faild on line: " << __LINE__ << " : (" << #T << ")" << std::endl;
 
 static html_parser html;
 static css_parser css;
@@ -55,7 +56,7 @@ void init_test() {
                     display: block;
                     }
                     /*comment outside - /*/
-            .p{ coloe: green; }
+                    .p{ coloe: green; }
                     .p,div{
                     background-image: url('image.png');
                     padding: 2px;
@@ -68,35 +69,23 @@ void init_test() {
     html.set_text(html_text);
     css.set_text(css_text);
 }
-TEST_CASE( "Init", "[init]" ) {
+
+int main() {
+
     init_test();
-}
-TEST_CASE("String", "[string]") {
+
     print("HTML Formatted", html.to_string(print_type::formatted));
     print("HTML Compact", html.to_string(print_type::compact));
     print("CSS compact", css.to_string(print_type::compact));
     print("CSS formatted", css.to_string(print_type::formatted));
-}
 
-TEST_CASE("Htm", "[html]"){
     auto tags = html.query("p.par b");
     std::for_each(tags.begin(), tags.end(), [](html_tag *tag){
-       tag->add_class("new-class");
+        tag->add_class("new-class");
     });
-    REQUIRE(1 == tags.size());
-}
-
-TEST_CASE("CSS Rules", "[css]") {
-    REQUIRE(4 == css.nodes().size());
-    REQUIRE(1 == css.find_match_selector("body").size());
-    REQUIRE(2 == css.find_contains_selector(".p").size());
-}
-
-
-void debug() {
-    print(html.tokens());
-    print(css.tokens());
-    print("HTML compact", html.to_string());
-    print("HTML formatted", html.to_string(print_type::formatted));
+    ASSERT(1 == tags.size());
+    ASSERT(4 == css.nodes().size());
+    ASSERT(1 == css.find_match_selector("body").size());
+    ASSERT(2 == css.find_contains_selector(".p").size());
 }
 
