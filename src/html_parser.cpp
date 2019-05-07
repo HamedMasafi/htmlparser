@@ -8,17 +8,24 @@
 #include <wctype.h>
 #include <algorithm>
 #include <string_renderer.h>
+#include <iostream>
 
 using namespace std;
+
+int html_parser::token(int n)
+{
+    return isalnum(n) || isdigit(n) || n == '-';
+}
 
 html_parser::html_parser() : token_parser(), _root_tag(nullptr)
 {
     _literals.push_back(new literal_t{">",  "<",  "",     true,  true});
     _literals.push_back(new literal_t{"\"", "\"", "\\\"", false, true});
     _literals.push_back(new literal_t{"'",  "'",  "\\'",  false, true});
+    _literals.push_back(new literal_t{"!--",  "-->",  "",     false,  false});
 
-    _check_fns.push_back(&isalpha);
-    _check_fns.push_back(&isdigit);
+    _check_fns.push_back(&html_parser::token);
+//    _check_fns.push_back(&isdigit);
 }
 
 html_parser::~html_parser()
@@ -49,11 +56,13 @@ void html_parser::parse()
         ++i;
     }
 
+    std::string dstr;
+
     for (; i < _tokens.size(); ++i) {
         string token = _tokens.at(i);
-
-        if (all_of(token.begin(), token.end(),
-                   [](char n){return !iswprint(n);}))
+        dstr += token;
+        if (none_of(token.begin(), token.end(), &iswprint))
+//                   [](char n){return isprint(n);}))
             continue;
 
         if (token == "<") {
@@ -63,12 +72,21 @@ void html_parser::parse()
             }
 
             if (_tokens.at(i + 1) == "/") {
-                stack.pop();
+                if (!stack.size()) {
+                    std::cerr << "Invalid document: " << _tokens.at(i + 2) << std::endl;
+                    return;
+                } else {
+                    auto tag_expected = _tokens.at(i + 2);
+                    auto real_tag = stack.top()->name;
+//                    cout << " <=> " << tag_expected << "  ,  " << real_tag << std::endl;
+                    stack.pop();
+                }
             } else {
                 html_tag *tag = parse_tag_begin(_tokens, i);
                 if (tag) {
-                    if (!tags.size())
+                    if (!_root_tag)
                         _root_tag = tag;
+
                     if (stack.size()) {
                         tag->set_parent(stack.top());
                         stack.top()->add_child(tag);
@@ -77,6 +95,11 @@ void html_parser::parse()
                     tags.push_back(tag);
                     if (tag->hasCloseTag())
                         stack.push(tag);
+                    else
+//                        std::cout << tag->name << " has not close tag" << endl;
+                    continue;
+                } else {
+                    std::cerr << _error_message << endl;
                 }
             }
         }
@@ -86,6 +109,11 @@ void html_parser::parse()
             if (_tokens.size() > i + 1 && _tokens.at(i + 1) != "<") {
                 auto text = string_helper::trim_copy(_tokens.at(i + 1));
                 if (any_of(text.begin(), text.end(), &iswalpha)) {
+                    if (!stack.size()) {
+                        std::cerr << "Invalid document" << std::endl << text;
+                        return;
+                    }
+
                     text_node *textNode = new text_node;
                     textNode->setText(text);
                     stack.top()->add_child(textNode);
@@ -140,62 +168,71 @@ html_tag *html_parser::parse_tag_begin(std::vector<string> &tokensList, size_t &
     string token;
     i++;
     auto tag_name = tokensList.at(i++);
+    if (tag_name=="<")
+        return nullptr;
+
     if (tag_name == "style")
         tag = new style_tag;
     else
         tag = new html_tag;
 
     tag->name = tag_name;
-//    map<string, string> attrs;
     string name, value;
     int step = 0;
     /*
 
-    name
-     =
-     "
-     value
-     "
+     name       0
+     =          1
+     "          -
+     value      2
+     "          -
 
      */
-    if (tokensList.at(i) != ">")
+    if (tokensList.at(i) != ">") {
         do {
-        if (i == tokensList.size()) {
-            _error_message = "Unexpected end of document";
-            delete tag;
-            return nullptr;
-        }
-        token = tokensList.at(i++);
-
-        if (token == ">")
-            break;
-
-        switch (step) {
-        case 0:
-            name = token;
-            step++;
-            break;
-
-        case 1:
-            if (token == "=")
-                step++;
-            else {
-                _error_message = "Unexpected " + token + " token";
-                        //<< "error; token is" << token << "in" << step << "step for" << tag->name;
+            if (i == tokensList.size()) {
+                _error_message = "Unexpected end of document";
                 delete tag;
                 return nullptr;
             }
-            break;
+            token = tokensList.at(i++);
 
-        case 2:
-            step = 0;
-            value = token;
-            tag->set_attr(name, value);
-            break;
-        }
-    } while (token != ">");
+            if (token == ">")
+                break;
 
-    tag->setHasCloseTag(tokensList.at(i - 2) != "/");
-    i--;
+            if (token == "\"")
+                continue;
+
+            switch (step) {
+            case 0:
+                name = token;
+                step++;
+                break;
+
+            case 1:
+                if (token == "=")
+                    step++;
+                else {
+//                    std::cout << "name = " << name << endl;
+//                    std::cout << "error:" <<token << " =>" << tag->name<< endl;
+                    _error_message = "Unexpected token: " + token + " in parsing " + tag->name;
+                    std::cerr << "error; token is " << token << " in " << step << " step for" << tag->name << std::endl;
+                    delete tag;
+                    return nullptr;
+                }
+                break;
+
+            case 2:
+                step++;
+                value = token;
+                tag->set_attr(name, value);
+                break;
+            }
+        } while (token != ">");
+        i--;
+    }
+
+    tag->setHasCloseTag(tokensList.at(i - 1) != "/");
+
     return tag;
 }

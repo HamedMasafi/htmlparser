@@ -88,7 +88,7 @@ std::map<std::string, std::string> css_parser::parse_block()
         auto value = _tokens.at(i + 2);
 
         std::cout << std::endl << name << colon << value << std::endl;
-        if (_tokens.size() >= i + 3 && _tokens.at(i + 3) != ";") {
+        if (_tokens.size() > i + 3 && _tokens.at(i + 3) != ";") {
             _error_message = "Unecpected token: " + _tokens.at(i + 3);
             break;
         }

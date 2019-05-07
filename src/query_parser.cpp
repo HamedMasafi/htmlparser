@@ -1,13 +1,21 @@
 #include "html_node.h"
 #include "query_parser.h"
 
+#include <iostream>
 #include <wctype.h>
 #include <algorithm>
 #include <string>
 
+
+int query_parser::token(int n)
+{
+    return isalpha(n) || isdigit(n) || n == '-';
+}
+
 query_parser::query_parser() : token_parser()
 {
-    _check_fns.push_back(&isalnum);
+//    _check_fns.push_back(&isalnum);
+    _check_fns.push_back(&query_parser::token);
 }
 
 void query_parser::parse()
@@ -17,6 +25,7 @@ void query_parser::parse()
     std::vector<query_rule_t*> rl;
     for (size_t i = 0; i < _tokens.size(); ++i) {
         auto t = _tokens.at(i);
+        std::cerr << t << std::endl;
         if (t == ",") {
             rl.push_back(last_rule);
             rules.push_back(rl);
@@ -50,6 +59,7 @@ void query_parser::parse()
 
     }
     rl.push_back(last_rule);
+
     rules.push_back(rl);
 }
 
@@ -90,6 +100,9 @@ bool query_parser::query_rule_t::is_valid() const {
 
 bool query_parser::query_rule_t::check(html_tag *tag) const
 {
+    if (!tag)
+        return false;
+
     if (id.size() && tag->id() != id)
         return false;
 
@@ -106,4 +119,9 @@ bool query_parser::query_rule_t::check(html_tag *tag) const
         }
 
     return true;
+}
+
+query_parser::query_rule_t::query_rule_t() : is_child(false)
+{
+
 }

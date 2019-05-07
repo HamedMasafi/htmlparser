@@ -17,6 +17,8 @@ class query_parser : public token_parser
 
         bool is_valid() const;
         bool check(html_tag *tag) const;
+
+        query_rule_t();
     };
     std::vector<std::vector<query_rule_t*>> rules;
 
@@ -31,6 +33,8 @@ public:
     void search(std::vector<html_tag*> *tags, html_tag *tag,
                 size_t &rule_id,
                 std::vector<query_rule_t *> rules);
+private:
+    static int token(int n);
 };
 
 #endif // QUERY_PARSER_H

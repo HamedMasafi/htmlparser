@@ -25,6 +25,7 @@ public:
 private:
     void parse() override;
     html_tag *parse_tag_begin(std::vector<std::string> &tokensList, size_t &i);
+    static int token(int n);
 };
 
 #endif // HTMLPARSER_H
