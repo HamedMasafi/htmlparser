@@ -73,7 +73,7 @@ std::vector<html_tag *> query_parser::search()
     return tags;
 }
 
-void query_parser::search(std::vector<html_tag *> *tags, html_tag *tag, size_t &rule_id, std::vector<query_rule_t *> rules)
+void query_parser::search(std::vector<html_tag *> *tags, html_tag *tag, size_t rule_id, std::vector<query_rule_t *> rules)
 {
     if (rule_id >= rules.size()) {
         return;

@@ -225,6 +225,11 @@ void html_node::set_parent(html_node *parent)
     _parent = parent;
 }
 
+html_tag *html_node::to_tag()
+{
+    return dynamic_cast<html_tag*>(this);
+}
+
 text_node::text_node() : html_node ()
 {
 

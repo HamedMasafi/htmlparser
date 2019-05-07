@@ -43,7 +43,10 @@ void css_parser::parse()
             auto value = _tokens.at(i + 2);
             auto semi_colon = _tokens.at(i + 3);
             last_node->set_attr(token, value);
-            i += 3;
+//            i += 3;
+            while (_tokens.at(i) != ";" && _tokens.at(i) != "}")
+                ++i;
+
             continue;
         } else {
             if (token != ",")

@@ -9,6 +9,7 @@
 
 class css_node;
 class string_renderer;
+class html_tag;
 class html_node
 {
     html_node *_parent;
@@ -26,6 +27,8 @@ public:
     {
         return  "";
     }
+
+    html_tag *to_tag();
 //protected:
     virtual void append(string_renderer &r) = 0;
 };
