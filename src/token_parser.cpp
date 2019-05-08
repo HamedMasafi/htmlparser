@@ -1,4 +1,4 @@
-#include "css_doc.h"
+#include "css_node.h"
 #include "html_node.h"
 #include "token_parser.h"
 #include "string_helper.h"
@@ -10,6 +10,8 @@
 #include <algorithm>
 
 using namespace std;
+
+PARSER_BEGIN_NAMESPACE
 
 token_parser::token_parser()
 {
@@ -136,3 +138,4 @@ bool token_parser::is_valid_token(const string &token) const
     });
 }
 
+PARSER_END_NAMESPACE

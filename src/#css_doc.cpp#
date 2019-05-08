@@ -1,7 +1,7 @@
-#include "css_doc.h"
+#include "../include/css_doc.h"
 
 #include <algorithm>
-#include "string_renderer.h"
+#include "../include/string_renderer. h"
 
 css_node::css_node()
 {

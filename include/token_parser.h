@@ -1,9 +1,12 @@
 #ifndef TOKENPARSER_H
 #define TOKENPARSER_H
 
+#include "global.h"
 #include <functional>
 #include <vector>
 #include <list>
+
+PARSER_BEGIN_NAMESPACE
 
 class token_parser
 {
@@ -44,5 +47,7 @@ protected:
     std::string read_until(const std::string &text, size_t &i, const literal_t *lt) const;
     bool is_valid_token(const std::string &token) const;
 };
+
+PARSER_END_NAMESPACE
 
 #endif // TOKENPARSER_H

@@ -1,4 +1,4 @@
-#include "html_parser.h"
+#include "html_document.h"
 #include "html_node.h"
 #include "query_parser.h"
 #include "string_helper.h"
@@ -12,32 +12,34 @@
 
 using namespace std;
 
-int html_parser::token(int n)
+PARSER_BEGIN_NAMESPACE
+
+int html_document::token(int n)
 {
     return isalnum(n) || isdigit(n) || n == '-';
 }
 
-html_parser::html_parser() : token_parser(), _root_tag(nullptr)
+html_document::html_document() : token_parser(), _root_tag(nullptr)
 {
     _literals.push_back(new literal_t{">",  "<",  "",     true,  true});
     _literals.push_back(new literal_t{"\"", "\"", "\\\"", false, true});
     _literals.push_back(new literal_t{"'",  "'",  "\\'",  false, true});
     _literals.push_back(new literal_t{"!--",  "-->",  "",     false,  false});
 
-    _check_fns.push_back(&html_parser::token);
+    _check_fns.push_back(&html_document::token);
 //    _check_fns.push_back(&isdigit);
 }
 
-html_parser::~html_parser()
+html_document::~html_document()
 {
     delete _root_tag;
 }
 
-html_tag *html_parser::root_tag() const {
+html_tag *html_document::root_tag() const {
     return _root_tag;
 }
 
-void html_parser::parse()
+void html_document::parse()
 {
     size_t i = 0;
 
@@ -123,7 +125,7 @@ void html_parser::parse()
     }
 }
 
-html_tag *html_parser::get_by_id(const string &id)
+html_node *html_document::get_by_id(const string &id)
 {
     auto tags = query("#" + id);
     if (tags.size())
@@ -132,17 +134,17 @@ html_tag *html_parser::get_by_id(const string &id)
         return nullptr;
 }
 
-std::vector<html_tag *> html_parser::get_by_tag_name(const string &tag_name)
+html_tag_vector html_document::get_by_tag_name(const string &tag_name)
 {
     return query(tag_name);
 }
 
-std::vector<html_tag *> html_parser::get_by_class_name(const string &class_name)
+html_tag_vector html_document::get_by_class_name(const string &class_name)
 {
     return query("." + class_name);
 }
 
-std::vector<html_tag *> html_parser::query(const string &q)
+html_tag_vector html_document::query(const string &q)
 {
     query_parser qp;
     qp.set_text(q);
@@ -150,7 +152,7 @@ std::vector<html_tag *> html_parser::query(const string &q)
     return qp.search();
 }
 
-string html_parser::to_string(print_type type) const
+string html_document::to_string(print_type type) const
 {
     string_renderer r(type);
 
@@ -162,7 +164,7 @@ string html_parser::to_string(print_type type) const
     return r.to_string();
 }
 
-html_tag *html_parser::parse_tag_begin(std::vector<string> &tokensList, size_t &i)
+html_tag *html_document::parse_tag_begin(std::vector<string> &tokensList, size_t &i)
 {
     html_tag *tag;
     string token;
@@ -236,3 +238,5 @@ html_tag *html_parser::parse_tag_begin(std::vector<string> &tokensList, size_t &
 
     return tag;
 }
+
+PARSER_END_NAMESPACE

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <wctype.h>
 
+PARSER_BEGIN_NAMESPACE
+
 string_helper::string_helper()
 {
 
@@ -80,3 +82,5 @@ std::vector<std::string> string_helper::split(std::string str, const char &sep)
         parts.push_back(temp);
     return parts;
 }
+
+PARSER_END_NAMESPACE

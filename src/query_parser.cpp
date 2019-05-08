@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 
+PARSER_BEGIN_NAMESPACE
 
 int query_parser::token(int n)
 {
@@ -63,9 +64,9 @@ void query_parser::parse()
     rules.push_back(rl);
 }
 
-std::vector<html_tag *> query_parser::search()
+html_tag_vector query_parser::search()
 {
-    std::vector<html_tag *> tags;
+    html_tag_vector tags;
     for (auto l : rules) {
         size_t i = 0;
         search(&tags, tag, i, l);
@@ -73,7 +74,7 @@ std::vector<html_tag *> query_parser::search()
     return tags;
 }
 
-void query_parser::search(std::vector<html_tag *> *tags, html_tag *tag, size_t rule_id, std::vector<query_rule_t *> rules)
+void query_parser::search(html_tag_vector *tags, html_tag *tag, size_t rule_id, std::vector<query_rule_t *> rules)
 {
     if (rule_id >= rules.size()) {
         return;
@@ -125,3 +126,5 @@ query_parser::query_rule_t::query_rule_t() : is_child(false)
 {
 
 }
+
+PARSER_END_NAMESPACE

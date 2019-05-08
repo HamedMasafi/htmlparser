@@ -2,8 +2,8 @@
 #include <algorithm>
 
 #include "include/token_parser.h"
-#include "include/css_parser.h"
-#include "include/html_parser.h"
+#include "include/css_document.h"
+#include "include/html_document.h"
 #include "include/html_node.h"
 #include "include/query_parser.h"
 
@@ -11,8 +11,8 @@
     if (!(T)) \
     std::cout << "Assert faild on line: " << __LINE__ << " : (" << #T << ")" << std::endl;
 
-static html_parser html;
-static css_parser css;
+static html_document html;
+static css_document css;
 void print(std::vector<std::string> tokens){
     std::cout << "==== TOKENS ====" << std::endl;
     for (std::string t : tokens) {

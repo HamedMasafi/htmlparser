@@ -1,10 +1,13 @@
 #ifndef QUERY_PARSER_H
 #define QUERY_PARSER_H
 
+#include "html_tag_vector.h"
 #include "token_parser.h"
 
 #include <string>
 #include <vector>
+
+PARSER_BEGIN_NAMESPACE
 
 class html_tag;
 class query_parser : public token_parser
@@ -29,12 +32,14 @@ public:
 public:
     void parse();
     html_tag *tag;
-    std::vector<html_tag*> search();
-    void search(std::vector<html_tag*> *tags, html_tag *tag,
+    html_tag_vector search();
+    void search(html_tag_vector *tags, html_tag *tag,
                 size_t rule_id,
                 std::vector<query_rule_t *> rules);
 private:
     static int token(int n);
 };
+
+PARSER_END_NAMESPACE
 
 #endif // QUERY_PARSER_H

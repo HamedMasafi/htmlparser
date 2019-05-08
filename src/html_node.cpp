@@ -1,5 +1,5 @@
-#include "css_parser.h"
-#include "css_doc.h"
+#include "css_document.h"
+#include "css_node.h"
 #include "html_node.h"
 #include "string_helper.h"
 #include "token_parser.h"
@@ -7,6 +7,8 @@
 #include <iostream>
 #include <algorithm>
 #include <string_renderer.h>
+
+PARSER_BEGIN_NAMESPACE
 
 bool html_tag::hasCloseTag() const
 {
@@ -120,7 +122,7 @@ void html_tag::set_attr(const std::string &name, const std::string &value)
     auto n = name;
     string_helper::tolower(n);
     if (n == "style") {
-        css_parser p;
+        css_document p;
         p.set_text(value);
         auto rules = p.parse_block();
         _css->_rules = rules;
@@ -310,3 +312,5 @@ void style_tag::add_child(html_node *child)
         std::cout << "Appending non-text node to style tag was not allowed";
     }
 }
+
+PARSER_END_NAMESPACE

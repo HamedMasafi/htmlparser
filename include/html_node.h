@@ -2,10 +2,12 @@
 #define HTMLTAG_H
 
 #include "global.h"
-#include "css_doc.h"
-#include "css_parser.h"
+#include "css_node.h"
+#include "css_document.h"
 #include <string>
 #include <vector>
+
+PARSER_BEGIN_NAMESPACE
 
 class css_node;
 class string_renderer;
@@ -17,6 +19,7 @@ class html_node
 public:
     html_node();
     virtual ~html_node();
+
     html_node *parent() const;
     void set_parent(html_node *parent);
     virtual std::string outter_html()
@@ -29,8 +32,12 @@ public:
     }
 
     html_tag *to_tag();
-//protected:
+
+protected:
     virtual void append(string_renderer &r) = 0;
+
+    friend class html_document;
+    friend class html_tag;
 };
 
 class text_node : public html_node
@@ -42,11 +49,13 @@ public:
     text_node();
     std::string text() const;
     void setText(const std::string &text);
-    std::string outter_html();
-    std::string inner_text() const;
+    std::string outter_html() override;
+    std::string inner_text() const override;
 
 private:
     void append(string_renderer &r) override;
+
+    friend class html_document;
 };
 
 class html_tag : public html_node
@@ -62,7 +71,7 @@ public:
     std::string name;
 
     html_tag();
-    virtual ~html_tag();
+    virtual ~html_tag() override;
 
     std::string id();
     std::string attr(const std::string &name);
@@ -74,9 +83,9 @@ public:
 
     virtual void add_child(html_node *child);
 
-    std::string outter_html();
+    std::string outter_html() override;
     virtual std::string inner_html() const;
-    std::string inner_text() const;
+    std::string inner_text() const override;
 //    std::string name() const;
 //    void setName(const std::string &name);
     bool hasCloseTag() const;
@@ -91,24 +100,26 @@ private:
     void append_inner_html(string_renderer &r);
     void append_end_tag(string_renderer &r);
 
-    friend class html_parser;
+    friend class html_document;
 };
 
 class style_tag : public html_tag
 {
 
 public:
-    css_parser rules;
+    css_document rules;
     style_tag();
 
-    void add_child(html_node *child);
+    void add_child(html_node *child) override;
 //    css_doc rules() const;
 //    void setRules(const css_doc &rules);
 
-    std::string inner_html() const;
+    std::string inner_html() const override;
 
 private:
     void append(string_renderer &r) override;
 };
+
+PARSER_END_NAMESPACE
 
 #endif // HTMLTAG_H

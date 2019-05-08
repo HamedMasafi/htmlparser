@@ -1,27 +1,29 @@
-#include "css_parser.h"
+#include "css_document.h"
 #include "string_renderer.h"
 #include <wctype.h>
 #include <iostream>
 
-std::vector<css_node *> css_parser::nodes() const
+PARSER_BEGIN_NAMESPACE
+
+std::vector<css_node *> css_document::nodes() const
 {
     return _nodes;
 }
 
-int css_parser::token(int n)
+int css_document::token(int n)
 {
     return isprint(n) && n != '{' && n != '}' && n != ':' && n != ';' && n != ',';
 }
 
-css_parser::css_parser()
+css_document::css_document()
 {
 //    _literals.push_back(new literal_t{"'", "'", "\\'", false, false});
     _literals.push_back(new literal_t{"/*", "*/", "", false, false});
 
-    _check_fns.push_back(&css_parser::token);
+    _check_fns.push_back(&css_document::token);
 }
 
-void css_parser::parse()
+void css_document::parse()
 {
     bool inside_block = false;
     css_node *last_node = new css_node;
@@ -55,12 +57,12 @@ void css_parser::parse()
     }
 }
 
-css_parser::~css_parser()
+css_document::~css_document()
 {
 
 }
 
-std::vector<css_node *> css_parser::find_contains_selector(const std::string &selector)
+std::vector<css_node *> css_document::find_contains_selector(const std::string &selector)
 {
     std::vector<css_node *> ret;
     for (css_node *node : _nodes)
@@ -69,7 +71,7 @@ std::vector<css_node *> css_parser::find_contains_selector(const std::string &se
     return ret;
 }
 
-std::vector<css_node *> css_parser::find_match_selector(const std::string &selector)
+std::vector<css_node *> css_document::find_match_selector(const std::string &selector)
 {
     std::vector<css_node *> ret;
     for (css_node *node : _nodes)
@@ -78,11 +80,11 @@ std::vector<css_node *> css_parser::find_match_selector(const std::string &selec
     return ret;
 }
 
-std::map<std::string, std::string> css_parser::parse_block()
+std::map<std::string, std::string> css_document::parse_block()
 {
     size_t i = 0;
     std::map<std::string, std::string> ret;
-    std::cout << "css count:" << _tokens.size() << std::endl;
+
     while (true) {
         if (_tokens.size() < i + 3)
             break;
@@ -90,7 +92,6 @@ std::map<std::string, std::string> css_parser::parse_block()
         auto colon = _tokens.at(i + 1);
         auto value = _tokens.at(i + 2);
 
-        std::cout << std::endl << name << colon << value << std::endl;
         if (_tokens.size() > i + 3 && _tokens.at(i + 3) != ";") {
             _error_message = "Unecpected token: " + _tokens.at(i + 3);
             break;
@@ -102,7 +103,7 @@ std::map<std::string, std::string> css_parser::parse_block()
     return ret;
 }
 
-std::string css_parser::to_string(print_type type) const
+std::string css_document::to_string(print_type type) const
 {
     string_renderer r(type);
     for (auto i = _nodes.cbegin(); i != _nodes.cend(); ++i)
@@ -110,4 +111,4 @@ std::string css_parser::to_string(print_type type) const
     return r.to_string();
 }
 
-
+PARSER_END_NAMESPACE

@@ -2,6 +2,8 @@
 
 #define INDENT_SIZE 4
 
+PARSER_BEGIN_NAMESPACE
+
 string_renderer::string_renderer(print_type type) : _type(type), _level(0), _last_action(last_action::etc)
 {
 
@@ -72,3 +74,5 @@ void string_renderer::set_type(const print_type &type)
 {
     _type = type;
 }
+
+PARSER_END_NAMESPACE

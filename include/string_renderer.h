@@ -4,6 +4,8 @@
 #include "global.h"
 #include <string>
 
+PARSER_BEGIN_NAMESPACE
+
 class string_renderer
 {
     std::string _buffer;
@@ -29,5 +31,7 @@ public:
     print_type type() const;
     void set_type(const print_type &type);
 };
+
+PARSER_END_NAMESPACE
 
 #endif // STRING_RENDERER_H
