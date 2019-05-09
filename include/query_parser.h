@@ -26,19 +26,20 @@ class query_parser : public token_parser
         query_rule_t();
     };
     std::vector<std::vector<query_rule_t*>> rules;
-
 public:
     query_parser();
+    html_tag_vector results;
 
-    // token_parser interface
-public:
     void parse();
     void parse_attrs(size_t &i, query_rule_t *rule);
+    void parse_child_selector(size_t &i, query_rule_t *rule);
+
     html_tag *tag;
     html_tag_vector search();
-    void search(html_tag_vector *tags, html_tag *tag,
+    void search(html_tag_vector &result, html_tag *tag,
                 size_t rule_id,
-                std::vector<query_rule_t *> rules);
+                std::vector<query_rule_t *> rules,
+                bool rescue = true);
 private:
     static int token(int n);
 };

@@ -81,7 +81,7 @@ int main() {
     print("CSS compact", css.to_string(print_type::compact));
     print("CSS formatted", css.to_string(print_type::formatted));
 
-    auto tags = html.query("p.par b[class=\"test\"]");
+    auto tags = html.query("p.par>b");
     std::for_each(tags.begin(), tags.end(), [](html_node *tag){
         tag->to_tag()->add_class("new-class");
     });

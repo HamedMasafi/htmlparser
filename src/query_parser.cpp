@@ -36,6 +36,10 @@ void query_parser::parse()
             continue;
         }
 
+        if (t == ":") {
+            parse_child_selector(i, last_rule);
+        }
+
         if (t == ".") {
             ++i;
             last_rule->classes.push_back(_tokens.at(i));
@@ -50,6 +54,8 @@ void query_parser::parse()
             rl.push_back(last_rule);
             last_rule = new query_rule_t;
             last_rule->is_child = true;
+            ++i;
+            last_rule->tag_name = _tokens.at(i);
             continue;
         }
 
@@ -75,7 +81,7 @@ void query_parser::parse()
             std::cout << std::endl
                       << "   id:" << r->id << std::endl
                       << "   tag name: " << r->tag_name << std::endl
-                      << "   is child: " << r->is_child << std::endl
+                      << "   is child: " << (r->is_child ? "true" : "false") << std::endl
                       << "   attr name: " << r->attr_name << std::endl
                       << "   attr value: " << r->attr_value << std::endl
                       << "   classes:" << std::endl;
@@ -130,35 +136,56 @@ void query_parser::parse_attrs(size_t &i, query_rule_t *rule)
     rule->attr_value = value;
 }
 
+void query_parser::parse_child_selector(size_t &i, query_parser::query_rule_t *rule)
+{
+    ++i;
+    /*
+     :
+     :nth-last-child
+     (
+     n
+     )
+     */
+    for (; i < _tokens.size(); ++i) {
+        auto t = _tokens.at(i);
+
+        if (t == ")")
+            break;
+
+    }
+}
+
 html_tag_vector query_parser::search()
 {
     html_tag_vector tags;
     for (auto l : rules) {
         size_t i = 0;
-        search(&tags, tag, i, l);
+        search(tags, tag, i, l);
     }
     return tags;
 }
 
-void query_parser::search(html_tag_vector *tags, html_tag *tag, size_t rule_id, std::vector<query_rule_t *> rules)
+void query_parser::search(html_tag_vector &result, html_tag *tag, size_t rule_id, std::vector<query_rule_t *> rules, bool rescue)
 {
     if (rule_id >= rules.size()) {
         return;
     }
 
     auto rule = rules.at(rule_id);
-    if (rule->check(tag)) {
+    if (!rule->check(tag))
+        return;
 
-        if (rule_id == rules.size() - 1)
-            tags->push_back(tag);
-        rule_id++;
-    }
+    if (rule_id == rules.size() - 1)
+        result.push_back(tag);
+    rule_id++;
 
-    for (auto child : tag->childs()) {
-        auto t = dynamic_cast<html_tag*>(child);
-        if (t)
-            search(tags, t, rule_id, rules);
-    }
+
+    if (rescue)
+        for (auto child : tag->childs()) {
+            auto t = dynamic_cast<html_tag*>(child);
+            if (t)
+                search(result, t, rule_id, rules, !rule->is_child);
+        }
 }
 
 bool query_parser::query_rule_t::is_valid() const {
