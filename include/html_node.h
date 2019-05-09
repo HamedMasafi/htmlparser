@@ -4,6 +4,7 @@
 #include "global.h"
 #include "css_node.h"
 #include "css_document.h"
+#include "html_tag_vector.h"
 #include <string>
 #include <vector>
 
@@ -47,8 +48,8 @@ class text_node : public html_node
 
 public:
     text_node();
-    std::string text() const;
-    void setText(const std::string &text);
+    std::string get_text() const;
+    void set_text(const std::string &get_text);
     std::string outter_html() override;
     std::string inner_text() const override;
 
@@ -75,6 +76,7 @@ public:
 
     std::string id();
     std::string attr(const std::string &name);
+    bool has_attr(const std::string &name);
     std::string data(const std::string &name);
     void set_attr(const std::string &name, const std::string &value);
     void add_class(const std::string &name);
@@ -91,6 +93,7 @@ public:
     bool hasCloseTag() const;
     void setHasCloseTag(bool hasCloseTag);
     std::vector<html_node *> childs() const;
+    html_tag_vector find(const std::string &query);
 
     std::string to_string(print_type type = print_type::compact);
 

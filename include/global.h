@@ -11,6 +11,8 @@
 #   define PARSER_END_NAMESPACE
 #endif
 
+#include <string>
+
 PARSER_BEGIN_NAMESPACE
 
 enum class print_type {
@@ -143,137 +145,139 @@ enum class html_tag_type {
     wbr, // Defines a possible line-break
 };
 
-//#include <string>
-//static inline std::string html_tag_str(const html_tag_type &type) {
-//    switch (type) {
-//    case html_tag_type::a: 	return "a";
-//    case html_tag_type::abbr: 	return "abbr";
-//    case html_tag_type::acronym: 	return "acronym";
-//    case html_tag_type::address: 	return "address";
-//    case html_tag_type::applet: 	return "applet";
-//    case html_tag_type::area: 	return "area";
-//    case html_tag_type::article: 	return "article";
-//    case html_tag_type::aside: 	return "aside";
-//    case html_tag_type::audio: 	return "audio";
-//    case html_tag_type::b: 	return "b";
-//    case html_tag_type::base: 	return "base";
-//    case html_tag_type::basefont: 	return "basefont";
-//    case html_tag_type::bdi: 	return "bdi";
-//    case html_tag_type::bdo: 	return "bdo";
-//    case html_tag_type::big: 	return "big";
-//    case html_tag_type::blockquote: 	return "blockquote";
-//    case html_tag_type::body: 	return "body";
-//    case html_tag_type::br: 	return "br";
-//    case html_tag_type::button: 	return "button";
-//    case html_tag_type::canvas: 	return "canvas";
-//    case html_tag_type::caption: 	return "caption";
-//    case html_tag_type::center: 	return "center";
-//    case html_tag_type::cite: 	return "cite";
-//    case html_tag_type::code: 	return "code";
-//    case html_tag_type::col: 	return "col";
-//    case html_tag_type::colgroup: 	return "colgroup";
-//    case html_tag_type::data: 	return "data";
-//    case html_tag_type::datalist: 	return "datalist";
-//    case html_tag_type::dd: 	return "dd";
-//    case html_tag_type::del: 	return "del";
-//    case html_tag_type::details: 	return "details";
-//    case html_tag_type::dfn: 	return "dfn";
-//    case html_tag_type::dialog: 	return "dialog";
-//    case html_tag_type::dir: 	return "dir";
-//    case html_tag_type::div: 	return "div";
-//    case html_tag_type::dl: 	return "dl";
-//    case html_tag_type::dt: 	return "dt";
-//    case html_tag_type::em: 	return "em";
-//    case html_tag_type::embed: 	return "embed";
-//    case html_tag_type::fieldset: 	return "fieldset";
-//    case html_tag_type::figcaption: 	return "figcaption";
-//    case html_tag_type::figure: 	return "figure";
-//    case html_tag_type::font: 	return "font";
-//    case html_tag_type::footer: 	return "footer";
-//    case html_tag_type::form: 	return "form";
-//    case html_tag_type::frame: 	return "frame";
-//    case html_tag_type::frameset: 	return "frameset";
-//    case html_tag_type::h1: 	return "h1";
-//    case html_tag_type::h2: 	return "h2";
-//    case html_tag_type::h3: 	return "h3";
-//    case html_tag_type::h4: 	return "h4";
-//    case html_tag_type::h5: 	return "h5";
-//    case html_tag_type::h6: 	return "h6";
-//    case html_tag_type::head: 	return "head";
-//    case html_tag_type::header: 	return "header";
-//    case html_tag_type::hr: 	return "hr";
-//    case html_tag_type::html: 	return "html";
-//    case html_tag_type::i: 	return "i";
-//    case html_tag_type::iframe: 	return "iframe";
-//    case html_tag_type::img: 	return "img";
-//    case html_tag_type::input: 	return "input";
-//    case html_tag_type::ins: 	return "ins";
-//    case html_tag_type::kbd: 	return "kbd";
-//    case html_tag_type::label: 	return "label";
-//    case html_tag_type::legend: 	return "legend";
-//    case html_tag_type::li: 	return "li";
-//    case html_tag_type::link: 	return "link";
-//    case html_tag_type::main: 	return "main";
-//    case html_tag_type::map: 	return "map";
-//    case html_tag_type::mark: 	return "mark";
-//    case html_tag_type::meta: 	return "meta";
-//    case html_tag_type::meter: 	return "meter";
-//    case html_tag_type::nav: 	return "nav";
-//    case html_tag_type::noframes: 	return "noframes";
-//    case html_tag_type::noscript: 	return "noscript";
-//    case html_tag_type::object: 	return "object";
-//    case html_tag_type::ol: 	return "ol";
-//    case html_tag_type::optgroup: 	return "optgroup";
-//    case html_tag_type::option: 	return "option";
-//    case html_tag_type::output: 	return "output";
-//    case html_tag_type::p: 	return "p";
-//    case html_tag_type::param: 	return "param";
-//    case html_tag_type::picture: 	return "picture";
-//    case html_tag_type::pre: 	return "pre";
-//    case html_tag_type::progress: 	return "progress";
-//    case html_tag_type::q: 	return "q";
-//    case html_tag_type::rp: 	return "rp";
-//    case html_tag_type::rt: 	return "rt";
-//    case html_tag_type::ruby: 	return "ruby";
-//    case html_tag_type::s: 	return "s";
-//    case html_tag_type::samp: 	return "samp";
-//    case html_tag_type::script: 	return "script";
-//    case html_tag_type::section: 	return "section";
-//    case html_tag_type::select: 	return "select";
-//    case html_tag_type::small: 	return "small";
-//    case html_tag_type::source: 	return "source";
-//    case html_tag_type::span: 	return "span";
-//    case html_tag_type::strike: 	return "strike";
-//    case html_tag_type::strong: 	return "strong";
-//    case html_tag_type::style: 	return "style";
-//    case html_tag_type::sub: 	return "sub";
-//    case html_tag_type::summary: 	return "summary";
-//    case html_tag_type::sup: 	return "sup";
-//    case html_tag_type::svg: 	return "svg";
-//    case html_tag_type::table: 	return "table";
-//    case html_tag_type::tbody: 	return "tbody";
-//    case html_tag_type::td: 	return "td";
-//    case html_tag_type::template_: 	return "template";
-//    case html_tag_type::textarea: 	return "textarea";
-//    case html_tag_type::tfoot: 	return "tfoot";
-//    case html_tag_type::th: 	return "th";
-//    case html_tag_type::thead: 	return "thead";
-//    case html_tag_type::time: 	return "time";
-//    case html_tag_type::title: 	return "title";
-//    case html_tag_type::tr: 	return "tr";
-//    case html_tag_type::track: 	return "track";
-//    case html_tag_type::tt: 	return "tt";
-//    case html_tag_type::u: 	return "u";
-//    case html_tag_type::ul: 	return "ul";
-//    case html_tag_type::var: 	return "var";
-//    case html_tag_type::video: 	return "video";
-//    case html_tag_type::wbr: 	return "wbr";
-//    }
-//    return std::string();
-//}
-//bool operator ==(std::string &str, html_tag_type &t) {
-//    return str == parser::tag_type_str(t)l
-//}
+static inline std::string html_tag_str(const html_tag_type &type) {
+    switch (type) {
+    case html_tag_type::a: 	return "a";
+    case html_tag_type::abbr: 	return "abbr";
+    case html_tag_type::acronym: 	return "acronym";
+    case html_tag_type::address: 	return "address";
+    case html_tag_type::applet: 	return "applet";
+    case html_tag_type::area: 	return "area";
+    case html_tag_type::article: 	return "article";
+    case html_tag_type::aside: 	return "aside";
+    case html_tag_type::audio: 	return "audio";
+    case html_tag_type::b: 	return "b";
+    case html_tag_type::base: 	return "base";
+    case html_tag_type::basefont: 	return "basefont";
+    case html_tag_type::bdi: 	return "bdi";
+    case html_tag_type::bdo: 	return "bdo";
+    case html_tag_type::big: 	return "big";
+    case html_tag_type::blockquote: 	return "blockquote";
+    case html_tag_type::body: 	return "body";
+    case html_tag_type::br: 	return "br";
+    case html_tag_type::button: 	return "button";
+    case html_tag_type::canvas: 	return "canvas";
+    case html_tag_type::caption: 	return "caption";
+    case html_tag_type::center: 	return "center";
+    case html_tag_type::cite: 	return "cite";
+    case html_tag_type::code: 	return "code";
+    case html_tag_type::col: 	return "col";
+    case html_tag_type::colgroup: 	return "colgroup";
+    case html_tag_type::data: 	return "data";
+    case html_tag_type::datalist: 	return "datalist";
+    case html_tag_type::dd: 	return "dd";
+    case html_tag_type::del: 	return "del";
+    case html_tag_type::details: 	return "details";
+    case html_tag_type::dfn: 	return "dfn";
+    case html_tag_type::dialog: 	return "dialog";
+    case html_tag_type::dir: 	return "dir";
+    case html_tag_type::div: 	return "div";
+    case html_tag_type::dl: 	return "dl";
+    case html_tag_type::dt: 	return "dt";
+    case html_tag_type::em: 	return "em";
+    case html_tag_type::embed: 	return "embed";
+    case html_tag_type::fieldset: 	return "fieldset";
+    case html_tag_type::figcaption: 	return "figcaption";
+    case html_tag_type::figure: 	return "figure";
+    case html_tag_type::font: 	return "font";
+    case html_tag_type::footer: 	return "footer";
+    case html_tag_type::form: 	return "form";
+    case html_tag_type::frame: 	return "frame";
+    case html_tag_type::frameset: 	return "frameset";
+    case html_tag_type::h1: 	return "h1";
+    case html_tag_type::h2: 	return "h2";
+    case html_tag_type::h3: 	return "h3";
+    case html_tag_type::h4: 	return "h4";
+    case html_tag_type::h5: 	return "h5";
+    case html_tag_type::h6: 	return "h6";
+    case html_tag_type::head: 	return "head";
+    case html_tag_type::header: 	return "header";
+    case html_tag_type::hr: 	return "hr";
+    case html_tag_type::html: 	return "html";
+    case html_tag_type::i: 	return "i";
+    case html_tag_type::iframe: 	return "iframe";
+    case html_tag_type::img: 	return "img";
+    case html_tag_type::input: 	return "input";
+    case html_tag_type::ins: 	return "ins";
+    case html_tag_type::kbd: 	return "kbd";
+    case html_tag_type::label: 	return "label";
+    case html_tag_type::legend: 	return "legend";
+    case html_tag_type::li: 	return "li";
+    case html_tag_type::link: 	return "link";
+    case html_tag_type::main: 	return "main";
+    case html_tag_type::map: 	return "map";
+    case html_tag_type::mark: 	return "mark";
+    case html_tag_type::meta: 	return "meta";
+    case html_tag_type::meter: 	return "meter";
+    case html_tag_type::nav: 	return "nav";
+    case html_tag_type::noframes: 	return "noframes";
+    case html_tag_type::noscript: 	return "noscript";
+    case html_tag_type::object: 	return "object";
+    case html_tag_type::ol: 	return "ol";
+    case html_tag_type::optgroup: 	return "optgroup";
+    case html_tag_type::option: 	return "option";
+    case html_tag_type::output: 	return "output";
+    case html_tag_type::p: 	return "p";
+    case html_tag_type::param: 	return "param";
+    case html_tag_type::picture: 	return "picture";
+    case html_tag_type::pre: 	return "pre";
+    case html_tag_type::progress: 	return "progress";
+    case html_tag_type::q: 	return "q";
+    case html_tag_type::rp: 	return "rp";
+    case html_tag_type::rt: 	return "rt";
+    case html_tag_type::ruby: 	return "ruby";
+    case html_tag_type::s: 	return "s";
+    case html_tag_type::samp: 	return "samp";
+    case html_tag_type::script: 	return "script";
+    case html_tag_type::section: 	return "section";
+    case html_tag_type::select: 	return "select";
+    case html_tag_type::small: 	return "small";
+    case html_tag_type::source: 	return "source";
+    case html_tag_type::span: 	return "span";
+    case html_tag_type::strike: 	return "strike";
+    case html_tag_type::strong: 	return "strong";
+    case html_tag_type::style: 	return "style";
+    case html_tag_type::sub: 	return "sub";
+    case html_tag_type::summary: 	return "summary";
+    case html_tag_type::sup: 	return "sup";
+    case html_tag_type::svg: 	return "svg";
+    case html_tag_type::table: 	return "table";
+    case html_tag_type::tbody: 	return "tbody";
+    case html_tag_type::td: 	return "td";
+    case html_tag_type::template_: 	return "template";
+    case html_tag_type::textarea: 	return "textarea";
+    case html_tag_type::tfoot: 	return "tfoot";
+    case html_tag_type::th: 	return "th";
+    case html_tag_type::thead: 	return "thead";
+    case html_tag_type::time: 	return "time";
+    case html_tag_type::title: 	return "title";
+    case html_tag_type::tr: 	return "tr";
+    case html_tag_type::track: 	return "track";
+    case html_tag_type::tt: 	return "tt";
+    case html_tag_type::u: 	return "u";
+    case html_tag_type::ul: 	return "ul";
+    case html_tag_type::var: 	return "var";
+    case html_tag_type::video: 	return "video";
+    case html_tag_type::wbr: 	return "wbr";
+    }
+    return std::string();
+}
+inline bool operator ==(std::string &str, html_tag_type &t) {
+    return str == html_tag_str(t);
+}
+inline bool operator !=(std::string &str, html_tag_type &t) {
+    return !(str == t);
+}
 
 PARSER_END_NAMESPACE
 

@@ -78,7 +78,7 @@ std::vector<std::string> string_helper::split(std::string str, const char &sep)
     std::string temp;
     std::vector<std::string> parts;
     std::stringstream wss(str);
-    while(std::getline(wss, temp, ';'))
+    while(std::getline(wss, temp, sep))
         parts.push_back(temp);
     return parts;
 }

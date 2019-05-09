@@ -11,6 +11,8 @@
     if (!(T)) \
     std::cout << "Assert faild on line: " << __LINE__ << " : (" << #T << ")" << std::endl;
 
+using namespace parser;
+
 static html_document html;
 static css_document css;
 void print(std::vector<std::string> tokens){
@@ -79,9 +81,9 @@ int main() {
     print("CSS compact", css.to_string(print_type::compact));
     print("CSS formatted", css.to_string(print_type::formatted));
 
-    auto tags = html.query("p.par b");
-    std::for_each(tags.begin(), tags.end(), [](html_tag *tag){
-        tag->add_class("new-class");
+    auto tags = html.query("p.par b[class=\"test\"]");
+    std::for_each(tags.begin(), tags.end(), [](html_node *tag){
+        tag->to_tag()->add_class("new-class");
     });
     ASSERT(1 == tags.size());
     ASSERT(4 == css.nodes().size());

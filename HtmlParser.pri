@@ -12,7 +12,8 @@ SOURCES += \
     $$PWD/src/string_helper.cpp \
     $$PWD/src/string_renderer.cpp \
     $$PWD/src/token_parser.cpp \
-    $$PWD/src/css_node.cpp
+    $$PWD/src/css_node.cpp \
+    $$PWD/src/html_writer.cpp
 
 HEADERS += \
     $$PWD/include/css_document.h \
@@ -24,4 +25,5 @@ HEADERS += \
     $$PWD/include/string_helper.h \
     $$PWD/include/string_renderer.h \
     $$PWD/include/token_parser.h \
-    $$PWD/include/css_node.h
+    $$PWD/include/css_node.h \
+    $$PWD/include/html_writer.h

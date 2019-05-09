@@ -16,6 +16,8 @@ class query_parser : public token_parser
         std::string id;
         std::string tag_name;
         std::vector<std::string> classes;
+        std::string attr_name;
+        std::string attr_value;
         bool is_child;
 
         bool is_valid() const;
@@ -31,6 +33,7 @@ public:
     // token_parser interface
 public:
     void parse();
+    void parse_attrs(size_t &i, query_rule_t *rule);
     html_tag *tag;
     html_tag_vector search();
     void search(html_tag_vector *tags, html_tag *tag,

@@ -117,7 +117,7 @@ void html_document::parse()
                     }
 
                     text_node *textNode = new text_node;
-                    textNode->setText(text);
+                    textNode->set_text(text);
                     stack.top()->add_child(textNode);
                 }
             }

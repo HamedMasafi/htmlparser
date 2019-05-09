@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string_renderer.h>
+#include <query_parser.h>
 
 PARSER_BEGIN_NAMESPACE
 
@@ -110,6 +111,11 @@ std::string html_tag::id()
 std::string html_tag::attr(const std::string &name)
 {
     return _attributes[name];
+}
+
+bool html_tag::has_attr(const std::string &name)
+{
+    return _attributes.find(name) != _attributes.end();
 }
 
 std::string html_tag::data(const std::string &name)
@@ -237,12 +243,12 @@ text_node::text_node() : html_node ()
 
 }
 
-std::string text_node::text() const
+std::string text_node::get_text() const
 {
     return _text;
 }
 
-void text_node::setText(const std::string &text)
+void text_node::set_text(const std::string &text)
 {
     _text = text;
     string_helper::replace(_text, "\r", "");
@@ -256,7 +262,16 @@ std::string text_node::outter_html()
 
 std::string text_node::inner_text() const
 {
+
     return  _text;
+}
+
+html_tag_vector html_tag::find(const std::string &query)
+{
+    query_parser qp;
+    qp.set_text(query);
+    qp.tag = this;
+    return qp.search();
 }
 
 void text_node::append(string_renderer &r)
@@ -307,7 +322,7 @@ void style_tag::add_child(html_node *child)
 {
     text_node *tn = dynamic_cast<text_node*>(child);
     if (tn) {
-        rules.set_text(tn->text());
+        rules.set_text(tn->get_text());
     } else {
         std::cout << "Appending non-text node to style tag was not allowed";
     }

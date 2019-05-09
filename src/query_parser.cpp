@@ -15,7 +15,8 @@ int query_parser::token(int n)
 
 query_parser::query_parser() : token_parser()
 {
-//    _check_fns.push_back(&isalnum);
+    _literals.push_back(new literal_t{"\"", "\"", "\\\"", false, true});
+
     _check_fns.push_back(&query_parser::token);
 }
 
@@ -52,6 +53,11 @@ void query_parser::parse()
             continue;
         }
 
+        if (t == "[") {
+            parse_attrs(i, last_rule);
+            continue;
+        }
+
         if (last_rule->is_valid())
             rl.push_back(last_rule);
         last_rule = new query_rule_t;
@@ -62,6 +68,66 @@ void query_parser::parse()
     rl.push_back(last_rule);
 
     rules.push_back(rl);
+
+    std::for_each(rules.begin(), rules.end(), [](std::vector<query_rule_t*> rl){
+        std::cout << "RULE: " << std::endl;
+        std::for_each(rl.begin(), rl.end(), [](query_rule_t *r){
+            std::cout << std::endl
+                      << "   id:" << r->id << std::endl
+                      << "   tag name: " << r->tag_name << std::endl
+                      << "   is child: " << r->is_child << std::endl
+                      << "   attr name: " << r->attr_name << std::endl
+                      << "   attr value: " << r->attr_value << std::endl
+                      << "   classes:" << std::endl;
+            std::for_each(r->classes.begin(), r->classes.end(), [](std::string cls){
+               std::cout << "      - " << cls << std::endl;
+            });
+        });
+        });
+}
+
+void query_parser::parse_attrs(size_t &i, query_rule_t *rule)
+{
+    std::string name, value, op;
+    /*
+     name       0
+     <op>
+     =          1
+     value      2
+    */
+    int step = 0;
+    for (; i < _tokens.size(); ++i) {
+        auto t = _tokens.at(i);
+
+        if (t == "]")
+            break;
+
+        if (t == "[")
+            continue;
+
+        switch (step) {
+        case 0:
+            if (name.empty())
+                name = t;
+            else
+                op = t;
+            step++;
+            continue;
+
+        case 1:
+            if (t != "=") {
+                return; // there is a error
+            }
+            step++;
+            continue;
+
+        case 2:
+            value = t;
+        }
+    }
+
+    rule->attr_name = name;
+    rule->attr_value = value;
 }
 
 html_tag_vector query_parser::search()
@@ -118,6 +184,15 @@ bool query_parser::query_rule_t::check(html_tag *tag) const
                 return false;
             }
         }
+
+    if (!attr_name.empty()) {
+        bool ok = attr_value.empty()
+                ? tag->has_attr(attr_name)
+                : tag->attr(attr_name) != attr_value;
+
+        if (!ok)
+            return false;
+    }
 
     return true;
 }
