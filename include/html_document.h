@@ -8,6 +8,7 @@
 PARSER_BEGIN_NAMESPACE
 
 class html_tag;
+class html_node;
 class html_document : public token_parser
 {
     html_tag *_root_tag;

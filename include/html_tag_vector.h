@@ -7,8 +7,8 @@
 
 PARSER_BEGIN_NAMESPACE
 
-class html_node;
-class html_tag_vector : public std::vector<html_node*>
+class html_tag;
+class html_tag_vector : public std::vector<html_tag*>
 {
 public:
     html_tag_vector();
@@ -19,8 +19,8 @@ public:
 
     html_tag_vector tags() const;
 
-    html_node *first_or_null();
-    html_node *last_or_null();
+    html_tag *first_or_null();
+    html_tag *last_or_null();
 };
 
 PARSER_END_NAMESPACE

@@ -173,11 +173,13 @@ void query_parser::search(html_tag_vector &result, html_tag *tag, size_t rule_id
 
     auto rule = rules.at(rule_id);
     if (!rule->check(tag))
-        return;
+        rule_id++;
+//        return;
 
-    if (rule_id == rules.size() - 1)
+    if (rule_id == rules.size()) {
         result.push_back(tag);
-    rule_id++;
+        return;
+    }
 
 
     if (rescue)
