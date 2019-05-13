@@ -15,7 +15,11 @@ SOURCES += main.cpp \
     src/query_parser.cpp \
     src/string_helper.cpp \
     src/string_renderer.cpp \
-    src/token_parser.cpp
+    src/token_parser.cpp \
+    src/json_document.cpp \
+    src/json_value.cpp \
+    src/json_array.cpp \
+    src/json_object.cpp
 
 HEADERS += \
     include/css_document.h \
@@ -28,4 +32,8 @@ HEADERS += \
     include/query_parser.h \
     include/string_helper.h \
     include/string_renderer.h \
-    include/token_parser.h
+    include/token_parser.h \
+    include/json_document.h \
+    include/json_value.h \
+    include/json_array.h \
+    include/json_object.h

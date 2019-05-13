@@ -1,0 +1,65 @@
+#include <algorithm>
+
+#include "json_object.h"
+#include "json_value.h"
+#include "string_renderer.h"
+
+PARSER_BEGIN_NAMESPACE
+
+json_object::json_object() : json_value ()
+{
+
+}
+
+parser::json_object::~json_object()
+{
+
+}
+
+void parser::json_object::insert(const std::string &name, parser::json_value *value)
+{
+    _values[name] = value;
+}
+
+json_value *parser::json_object::get(const std::string &name)
+{
+    return _values[name];
+}
+
+void json_object::render(string_renderer &r)
+{
+
+    auto count = _values.size();
+
+    bool is_simple = std::all_of(_values.begin(), _values.end(), [](std::map<std::string, json_value*>::const_reference it){
+            auto t = it.second->type();
+            return t == json_value_t::int_t || t == json_value_t::float_t || t == json_value_t::string_t;
+}) && count < 3;
+
+    r.append("{");
+    if (!is_simple) {
+        r.new_line();
+        r.indent();
+    }
+    for (auto i = _values.cbegin(); i != _values.cend(); ++i) {
+        r.append("'");
+        r.append((*i).first);
+        r.append("':");
+        r.space();
+        (*i).second->render(r);
+
+        if (--count)
+            r.append(",");
+
+        if (!is_simple)
+            r.new_line();
+    }
+
+    if (!is_simple) {
+        r.new_line();
+        r.unindent();
+    }
+    r.append("}");
+}
+
+PARSER_END_NAMESPACE

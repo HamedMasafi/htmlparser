@@ -27,7 +27,7 @@ void query_parser::parse()
     std::vector<query_rule_t*> rl;
     for (size_t i = 0; i < _tokens.size(); ++i) {
         auto t = _tokens.at(i);
-        std::cerr << t << std::endl;
+
         if (t == ",") {
             rl.push_back(last_rule);
             rules.push_back(rl);
@@ -75,21 +75,22 @@ void query_parser::parse()
 
     rules.push_back(rl);
 
-    std::for_each(rules.begin(), rules.end(), [](std::vector<query_rule_t*> rl){
-        std::cout << "RULE: " << std::endl;
-        std::for_each(rl.begin(), rl.end(), [](query_rule_t *r){
-            std::cout << std::endl
-                      << "   id:" << r->id << std::endl
-                      << "   tag name: " << r->tag_name << std::endl
-                      << "   is child: " << (r->is_child ? "true" : "false") << std::endl
-                      << "   attr name: " << r->attr_name << std::endl
-                      << "   attr value: " << r->attr_value << std::endl
-                      << "   classes:" << std::endl;
-            std::for_each(r->classes.begin(), r->classes.end(), [](std::string cls){
-               std::cout << "      - " << cls << std::endl;
-            });
-        });
-        });
+//    int i = 0;
+//    std::for_each(rules.begin(), rules.end(), [&i](std::vector<query_rule_t*> rl){
+//        std::cout << "RULE: " << (++i) << std::endl;
+//        std::for_each(rl.begin(), rl.end(), [](query_rule_t *r){
+//            std::cout << std::endl
+//                      << "   id:" << r->id << std::endl
+//                      << "   tag name: " << r->tag_name << std::endl
+//                      << "   is child: " << (r->is_child ? "true" : "false") << std::endl
+//                      << "   attr name: " << r->attr_name << std::endl
+//                      << "   attr value: " << r->attr_value << std::endl
+//                      << "   classes:" << std::endl;
+//            std::for_each(r->classes.begin(), r->classes.end(), [](std::string cls){
+//               std::cout << "      - " << cls << std::endl;
+//            });
+//        });
+//        });
 }
 
 void query_parser::parse_attrs(size_t &i, query_rule_t *rule)
@@ -172,7 +173,7 @@ void query_parser::search(html_tag_vector &result, html_tag *tag, size_t rule_id
     }
 
     auto rule = rules.at(rule_id);
-    if (!rule->check(tag))
+    if (rule->check(tag))
         rule_id++;
 //        return;
 

@@ -39,6 +39,14 @@ std::vector<std::string> token_parser::tokens() const
     return _tokens;
 }
 
+void parser::token_parser::print_invalid_token_message(const string &token, const string &expected)
+{
+    std::cout << "Invalid token '" << token << "'";
+    if (!expected.empty())
+        std::cout << ". Expected '" << expected << "'";
+    std::cout << "." << std::endl;
+}
+
 std::vector<std::string> token_parser::parse_tokens()
 {
     _tokens.clear();
@@ -136,6 +144,18 @@ bool token_parser::is_valid_token(const string &token) const
     return any_of(token.begin(), token.end(), [](char ch){
         return isprint(ch);
     });
+}
+
+string parser::token_parser::take_token()
+{
+    static auto i = _tokens.begin();
+    if (i == _tokens.end())
+        return std::string();
+
+    auto ret = *i;
+//    std::cout << "Token selected: " << ret << std::endl;
+    ++i;
+    return ret;
 }
 
 PARSER_END_NAMESPACE

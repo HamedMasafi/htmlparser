@@ -12,6 +12,25 @@ string_helper::string_helper()
 
 }
 
+bool parser::string_helper::is_integer(const std::string &s)
+{
+    return std::all_of(s.begin(), s.end(), [](int n){
+        return std::isdigit(n);
+    });
+}
+
+bool parser::string_helper::is_float(const std::__cxx11::string &s)
+{
+    int fc = 0;
+    return std::all_of(s.begin(), s.end(), [&fc](int n){
+        if (n == '.' && !fc) {
+            fc = 1;
+            return 1;
+        }
+        return std::isdigit(n);
+    });
+}
+
 void string_helper::ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
         return !std::isspace(ch);

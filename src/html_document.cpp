@@ -218,6 +218,7 @@ html_tag *html_document::parse_tag_begin(std::vector<string> &tokensList, size_t
 //                    std::cout << "name = " << name << endl;
 //                    std::cout << "error:" <<token << " =>" << tag->name<< endl;
                     _error_message = "Unexpected token: " + token + " in parsing " + tag->name;
+                    print_invalid_token_message(token, "=");
                     std::cerr << "error; token is " << token << " in " << step << " step for" << tag->name << std::endl;
                     delete tag;
                     return nullptr;
@@ -225,7 +226,7 @@ html_tag *html_document::parse_tag_begin(std::vector<string> &tokensList, size_t
                 break;
 
             case 2:
-                step++;
+                step = 0;
                 value = token;
                 tag->set_attr(name, value);
                 break;

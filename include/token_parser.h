@@ -41,11 +41,13 @@ public:
     std::vector<std::string> tokens() const;
 
 protected:
+    void print_invalid_token_message(const std::string &token, const std::string &expected = std::string());
     std::vector<std::string> parse_tokens();
     virtual void parse() = 0;
     std::string read_until(const std::string &text, size_t &i, std::function<int(int)> fn) const;
     std::string read_until(const std::string &text, size_t &i, const literal_t *lt) const;
     bool is_valid_token(const std::string &token) const;
+    std::string take_token();
 };
 
 PARSER_END_NAMESPACE
