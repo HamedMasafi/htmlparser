@@ -26,6 +26,11 @@ json_value *parser::json_object::get(const std::string &name)
     return _values[name];
 }
 
+json_value *json_object::operator[](const std::string &name)
+{
+    return _values[name];
+}
+
 void json_object::render(string_renderer &r)
 {
 

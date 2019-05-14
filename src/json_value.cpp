@@ -8,10 +8,8 @@
 
 PARSER_BEGIN_NAMESPACE
 
-json_value::json_value()
-{
-    _type = type_t::invalid;
-}
+json_value::json_value() : _type(type_t::invalid)
+{ }
 
 parser::json_value::json_value(const std::string &value) : _s(value)
 {

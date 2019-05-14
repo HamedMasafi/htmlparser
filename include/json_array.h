@@ -17,7 +17,9 @@ public:
     void add(json_value *v);
     json_value *at(const size_t &pos) const;
 
-    // json_value interface
+    const json_value *operator[](const size_t &i) const;
+    json_value *operator[](const size_t &i);
+
 private:
     void render(string_renderer &r) override;
 };

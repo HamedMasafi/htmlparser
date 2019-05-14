@@ -37,10 +37,16 @@ public:
     json_array *to_array();
 
 //    template<class T>
-//    void *to();
+//    T to();
 
-//    template<class T>
+//    template<>
 //    int to<int>();
+
+//    template<>
+//    float to<float>();
+
+//    template<>
+//    std::string to<std::string>();
 
 protected:
     type_t _type;

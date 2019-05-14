@@ -19,6 +19,8 @@ public:
     void insert(const std::string &name, json_value *value);
     json_value *get(const std::string &name);
 
+    json_value *operator[](const std::string &name);
+
 private:
     void render(string_renderer &r);
 

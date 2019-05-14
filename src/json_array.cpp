@@ -26,6 +26,16 @@ parser::json_value *parser::json_array::at(const size_t &pos) const
     return _values.at(pos);
 }
 
+const json_value *json_array::operator[](const size_t &i) const
+{
+    return _values[i];
+}
+
+json_value *json_array::operator[](const size_t &i)
+{
+    return _values[i];
+}
+
 void json_array::render(string_renderer &r)
 {
     if (!_values.size()) {
