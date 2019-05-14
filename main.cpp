@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <json_object.h>
 
 #include "include/json_value.h"
 #include "include/token_parser.h"
@@ -117,8 +118,10 @@ int main() {
     ASSERT(4 == css.nodes().size());
     ASSERT(1 == css.find_match_selector("body").size());
     ASSERT(2 == css.find_contains_selector(".p").size());
-    auto v = json.find("ia.2.b");
-    std::cout << static_cast<int>(v->type());
+    auto v = json.find("ia.1.b");
+    ASSERT(v->type() == json_value::json_value_t::int_t);
+    auto v2 = json.find("invalid_path");
+    ASSERT(v2 == nullptr);
     PASSED();
 }
 

@@ -41,12 +41,12 @@ std::string parser::json_document::to_string(parser::print_type type) const
 json_value *json_document::find(const std::string &path)
 {
     bool ok = std::all_of(path.begin(), path.end(), [](int n){
-        return std::isalpha(n) || n == '.';
+        return std::isalpha(n) || std::isdigit(n) || n == '.' || n == '_';
     });
-//    if (!ok) {
-//        std::cerr << "Invalid path" << std::endl;
-//        return nullptr;
-//    }
+    if (!ok) {
+        std::cerr << "Invalid path: " << path << std::endl;
+        return nullptr;
+    }
 
     std::vector<std::string> strings;
     std::istringstream f(path);

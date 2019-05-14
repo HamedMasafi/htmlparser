@@ -1,6 +1,12 @@
-# html parser lib
-A simple and lightweight html parse library for c++.
- 
+# Any parser
+
+Any parser is a simple and lightweight parsing library that can parse documents of types _html_, _css_ and _json_ (xml is comming soon).
+
+## More documents
+* [JSON](doc/json.md)
+* [HTML](doc/html.md)
+* [CSS](doc/css.md)
+
 ## License
 LGPL v2
 
