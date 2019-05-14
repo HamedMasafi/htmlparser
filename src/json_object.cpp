@@ -33,7 +33,7 @@ void json_object::render(string_renderer &r)
 
     bool is_simple = std::all_of(_values.begin(), _values.end(), [](std::map<std::string, json_value*>::const_reference it){
             auto t = it.second->type();
-            return t == json_value_t::int_t || t == json_value_t::float_t || t == json_value_t::string_t;
+            return t == type_t::int_t || t == type_t::float_t || t == type_t::string_t;
 }) && count < 3;
 
     r.append("{");

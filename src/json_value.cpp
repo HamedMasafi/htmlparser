@@ -10,24 +10,24 @@ PARSER_BEGIN_NAMESPACE
 
 json_value::json_value()
 {
-    _type = json_value_t::invalid;
+    _type = type_t::invalid;
 }
 
 parser::json_value::json_value(const std::string &value) : _s(value)
 {
     if (string_helper::is_integer(value)) {
         _n = std::stoi(value);
-        _type = json_value_t::int_t;
+        _type = type_t::int_t;
         return;
     };
 
     if (string_helper::is_float(value)) {
         _f = std::stof(value);
-        _type = json_value_t::float_t;
+        _type = type_t::float_t;
         return;
     };
 
-    _type = json_value_t::string_t;
+    _type = type_t::string_t;
 }
 
 json_value::~json_value()
@@ -35,14 +35,14 @@ json_value::~json_value()
 
 }
 
-json_value::json_value_t json_value::type() const
+json_value::type_t json_value::type() const
 {
     return _type;
 }
 
 json_array *parser::json_value::to_array()
 {
-    if (_type == json_value_t::array_t)
+    if (_type == type_t::array_t)
         return dynamic_cast<json_array*>(this);
     else
         return nullptr;
@@ -50,7 +50,7 @@ json_array *parser::json_value::to_array()
 
 parser::json_object *parser::json_value::to_object()
 {
-    if (_type == json_value_t::object_t)
+    if (_type == type_t::object_t)
         return dynamic_cast<json_object*>(this);
     else
         return nullptr;
@@ -73,15 +73,28 @@ int parser::json_value::to_int() const
 
 void parser::json_value::render(string_renderer &r)
 {
+    auto val = _s;
+    bool single_cotation = false;
+    bool double_cotation = false;
+    std::for_each(val.begin(), val.end(), [&](int ch){
+        if (ch == '\'')
+            single_cotation = true;
+        if (ch == '"')
+            double_cotation = true;
+    });
+
+    if (single_cotation && double_cotation)
+        string_helper::replace(val, "\"", "\\\"");
+
     switch (_type) {
-    case json_value_t::string_t:
-        r.append("'");
-        r.append(_s);
-        r.append("'");
+    case type_t::string_t:
+        r.append(single_cotation ? "\"" : "'");
+        r.append(val);
+        r.append(single_cotation ? "\"" : "'");
         break;
 
-    case json_value_t::int_t:
-    case json_value_t::float_t:
+    case type_t::int_t:
+    case type_t::float_t:
         r.append(_s);
         break;
 

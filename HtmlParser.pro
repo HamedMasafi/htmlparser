@@ -30,10 +30,10 @@ HEADERS += \
     include/html_tag_vector.h \
     include/html_writer.h \
     include/query_parser.h \
-    include/string_helper.h \
     include/string_renderer.h \
     include/token_parser.h \
     include/json_document.h \
     include/json_value.h \
     include/json_array.h \
-    include/json_object.h
+    include/json_object.h \
+    include/string_helper.h

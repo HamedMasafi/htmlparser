@@ -125,8 +125,13 @@ string token_parser::read_until(const string &text, size_t &i, const literal_t *
             return string();
 
         auto s = text.substr(++i, lt->end.length());
-        if (s == lt->end)
-            break;
+        if (s == lt->end) {
+            if (lt->ignore.empty())
+                break;
+            auto s2 = text.substr(i - lt->ignore.length() + 1, lt->ignore.length());
+            if (s2 != lt->ignore)
+                break;
+        }
     }
     if (i == start)
         return string();

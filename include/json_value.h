@@ -16,7 +16,7 @@ class json_value
     std::string _s;
 
 public:
-    enum class json_value_t{
+    enum class type_t{
         invalid,
         int_t,
         float_t,
@@ -28,7 +28,7 @@ public:
     json_value(const std::string &value);
     virtual ~json_value();
 
-    json_value_t type() const;
+    type_t type() const;
 
     int to_int() const;
     float to_float() const;
@@ -43,13 +43,14 @@ public:
 //    int to<int>();
 
 protected:
-    json_value_t _type;
+    type_t _type;
 
 private:
     virtual void render(string_renderer &r);
 
     friend class json_object;
     friend class json_array;
+    friend class json_document;
 };
 
 PARSER_END_NAMESPACE

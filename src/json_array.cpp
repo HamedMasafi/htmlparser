@@ -35,7 +35,7 @@ void json_array::render(string_renderer &r)
 
     bool is_simple = std::all_of(_values.begin(), _values.end(), [](json_value *v){
             auto t = v->type();
-            return t == json_value_t::int_t || t == json_value_t::float_t || t == json_value_t::string_t;
+            return t == type_t::int_t || t == type_t::float_t || t == type_t::string_t;
     });
     r.append("[");
     if (!is_simple) {

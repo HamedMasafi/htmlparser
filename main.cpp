@@ -83,10 +83,13 @@ void init_test() {
                      {
                         name: hamed,
                         last_name: masafi,
+                        unescaped: "the'string",
+                        unescaped2: 'the"string',
+                        unescaped3: "the'one\"string",
                         array: [1, 2, 3, 4, 5],
                         other: 4,
-                        f: 3.14,
-                        n: 10,
+                        "f" : 3.14,
+                        'n': 10,
                         ia: [
                                 {a : 2}, {b: 23},
                                 [1,2,5,7]
@@ -106,8 +109,8 @@ int main() {
 //    print("HTML Compact", html.to_string(print_type::compact));
 //    print("CSS formatted", css.to_string(print_type::formatted));
 //    print("CSS compact", css.to_string(print_type::compact));
-//    print("JSON formatted", json.to_string(print_type::formatted));
-//    print("JSON compact", json.to_string(print_type::compact));
+    print("JSON formatted", json.to_string(print_type::formatted));
+    print("JSON compact", json.to_string(print_type::compact));
 
     auto tags = html.query("p.par>b");
     std::for_each(tags.begin(), tags.end(), [](html_node *tag){
@@ -119,7 +122,8 @@ int main() {
     ASSERT(1 == css.find_match_selector("body").size());
     ASSERT(2 == css.find_contains_selector(".p").size());
     auto v = json.find("ia.1.b");
-    ASSERT(v->type() == json_value::json_value_t::int_t);
+    ASSERT(v != nullptr);
+    ASSERT(v->type() == json_value::type_t::int_t);
     auto v2 = json.find("invalid_path");
     ASSERT(v2 == nullptr);
     PASSED();
