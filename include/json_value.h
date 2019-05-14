@@ -13,11 +13,13 @@ class json_value
 {
     int _n;
     float _f;
+    bool _b;
     std::string _s;
 
 public:
     enum class type_t{
         invalid,
+        bool_t,
         int_t,
         float_t,
         string_t,
@@ -32,6 +34,7 @@ public:
 
     int to_int() const;
     float to_float() const;
+    bool to_bool() const;
     std::string to_string() const;
     json_object *to_object();
     json_array *to_array();

@@ -90,6 +90,7 @@ void init_test() {
                         other: 4,
                         "f" : 3.14,
                         'n': 10,
+                        b: true,
                         ia: [
                                 {a : 2}, {b: 23},
                                 [1,2,5,7]

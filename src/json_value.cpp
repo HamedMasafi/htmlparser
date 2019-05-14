@@ -13,6 +13,18 @@ json_value::json_value() : _type(type_t::invalid)
 
 parser::json_value::json_value(const std::string &value) : _s(value)
 {
+    if (value == "true") {
+        _type = type_t::bool_t;
+        _b = true;
+        return;
+    }
+
+    if (value == "false") {
+        _type = type_t::bool_t;
+        _b = false;
+        return;
+    }
+
     if (string_helper::is_integer(value)) {
         _n = std::stoi(value);
         _type = type_t::int_t;
@@ -64,6 +76,11 @@ float parser::json_value::to_float() const
     return _f;
 }
 
+bool parser::json_value::to_bool() const
+{
+    return _b;
+}
+
 int parser::json_value::to_int() const
 {
     return _n;
@@ -91,6 +108,7 @@ void parser::json_value::render(string_renderer &r)
         r.append(single_cotation ? "\"" : "'");
         break;
 
+    case type_t::bool_t:
     case type_t::int_t:
     case type_t::float_t:
         r.append(_s);
