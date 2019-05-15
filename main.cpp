@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <json_object.h>
+#include <chrono>
 
 #include "include/json_value.h"
 #include "include/token_parser.h"
@@ -12,12 +13,20 @@
 
 #define ASSERT(T) \
     if (!(T)) { \
-    std::cout << "Assert faild on line: " << __LINE__ << " : (" << #T << ")" << std::endl; \
+    std::cerr << "Assert faild on line: " << __LINE__ << " : (" << #T << ")" << std::endl; \
     exit(1); \
     }
 
+#define START()  \
+    typedef std::chrono::high_resolution_clock clock_; \
+    typedef std::chrono::duration<double, std::ratio<1> > second_; \
+    auto _start_time = clock_::now();
+
 #define PASSED() \
-    std::cout << "All tests PASSED" << std::endl; \
+    std::cout << std::endl \
+              << "All tests PASSED in: " \
+              << std::chrono::duration_cast<second_>(clock_::now() - _start_time).count() \
+              << "s" << std::endl; \
     exit(0);
 
 using namespace parser;
@@ -81,16 +90,19 @@ void init_test() {
 
     auto json_text = R"~(
                      {
-                        name: hamed,
-                        last_name: masafi,
+                        name: "hamed",
+                        last_name: "masafi",
                         unescaped: "the'string",
                         unescaped2: 'the"string',
                         unescaped3: "the'one\"string",
                         array: [1, 2, 3, 4, 5],
                         other: 4,
-                        "f" : 3.14,
-                        'n': 10,
+                        nl: null,
+                        pi : 3.14,
+                        n : 10 ,
                         b: true,
+                        bs: 'false',
+                        n: null,
                         ia: [
                                 {a : 2}, {b: 23},
                                 [1,2,5,7]
@@ -103,13 +115,13 @@ void init_test() {
 }
 
 int main() {
-
+    START();
     init_test();
 
-//    print("HTML Formatted", html.to_string(print_type::formatted));
-//    print("HTML Compact", html.to_string(print_type::compact));
-//    print("CSS formatted", css.to_string(print_type::formatted));
-//    print("CSS compact", css.to_string(print_type::compact));
+    print("HTML Formatted", html.to_string(print_type::formatted));
+    print("HTML Compact", html.to_string(print_type::compact));
+    print("CSS formatted", css.to_string(print_type::formatted));
+    print("CSS compact", css.to_string(print_type::compact));
     print("JSON formatted", json.to_string(print_type::formatted));
     print("JSON compact", json.to_string(print_type::compact));
 
@@ -127,6 +139,7 @@ int main() {
     ASSERT(v->type() == json_value::type_t::int_t);
     auto v2 = json.find("invalid_path");
     ASSERT(v2 == nullptr);
+
     PASSED();
 }
 

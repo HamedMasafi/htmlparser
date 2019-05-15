@@ -141,11 +141,22 @@ json_object *json_document::parse_object()
 //            break;
 
         switch (step) {
-        case 0:
-            name = token;
+        case 0: {
+            std::string content;
+            if (token == "\"" || token == "'") {
+                auto begin_quote = token;
+                name = take_token();
+                auto close_quote = take_token();
+
+                if (begin_quote != close_quote) {
+                    print_invalid_token_message(close_quote, begin_quote);
+                }
+            } else {
+                name = token;
+            }
             step++;
             continue;
-
+        }
         case 1:
             if (token != ":") {
                 print_invalid_token_message(token, ":");
@@ -209,8 +220,8 @@ void json_document::parse()
 void json_document::init()
 {
     _literals.push_back(new literal_t{"/*", "*/", "", false, false});
-    _literals.push_back(new literal_t{"'", "'", "", false, true});
-    _literals.push_back(new literal_t{"\"", "\"", "\\\"", false, true});
+    _literals.push_back(new literal_t{"'", "'", "", true, true});
+    _literals.push_back(new literal_t{"\"", "\"", "\\\"", true, true});
 
     _check_fns.push_back(&json_document::token);
 }
@@ -223,7 +234,40 @@ json_value *json_document::parse_value(const std::string &token)
     if (token == "[")
         return parse_array();
 
-    return new json_value(token);
+
+    if (token == "\"" || token == "'") {
+        auto begin_quote = token;
+        auto content = take_token();
+        auto close_quote = take_token();
+
+        if (begin_quote != close_quote) {
+            print_invalid_token_message(close_quote, begin_quote);
+        }
+
+        return new json_value(content);
+    } else {
+        if (token == "null")
+            return new json_value();
+
+        if (token == "true" || token == "false")
+            return new json_value(token == "true");
+
+        size_t idx = 0;
+        try {
+            int n = std::stoi(token, &idx);
+            if (idx == token.length())
+                return new json_value(n);
+        } catch (std::exception ex) { }
+
+        try {
+            float f = std::stof(token, &idx);
+            if (idx == token.length())
+                return new json_value(f);
+        } catch (std::exception ex) { }
+
+        print_invalid_token_message(token);
+        return nullptr;
+    }
 }
 
 json_value *json_document::parse_value()

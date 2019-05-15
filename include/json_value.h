@@ -27,6 +27,9 @@ public:
         array_t
     };
     json_value();
+    json_value(const bool &b);
+    json_value(const int &n);
+    json_value(const float &f);
     json_value(const std::string &value);
     virtual ~json_value();
 

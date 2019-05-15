@@ -11,34 +11,17 @@ PARSER_BEGIN_NAMESPACE
 json_value::json_value() : _type(type_t::invalid)
 { }
 
-parser::json_value::json_value(const std::string &value) : _s(value)
-{
-    if (value == "true") {
-        _type = type_t::bool_t;
-        _b = true;
-        return;
-    }
+parser::json_value::json_value(const bool &b) : _b(b), _type(type_t::bool_t)
+{ }
 
-    if (value == "false") {
-        _type = type_t::bool_t;
-        _b = false;
-        return;
-    }
+parser::json_value::json_value(const int &n) : _n(n), _type(type_t::int_t)
+{ }
 
-    if (string_helper::is_integer(value)) {
-        _n = std::stoi(value);
-        _type = type_t::int_t;
-        return;
-    };
+parser::json_value::json_value(const float &f) : _f(f), _type(type_t::float_t)
+{ }
 
-    if (string_helper::is_float(value)) {
-        _f = std::stof(value);
-        _type = type_t::float_t;
-        return;
-    };
-
-    _type = type_t::string_t;
-}
+parser::json_value::json_value(const std::string &value) : _s(value), _type(type_t::string_t)
+{ }
 
 json_value::~json_value()
 {
@@ -108,10 +91,20 @@ void parser::json_value::render(string_renderer &r)
         r.append(single_cotation ? "\"" : "'");
         break;
 
+    case type_t::invalid:
+        r.append("null");
+        break;
+
     case type_t::bool_t:
+        r.append(_b ? "true" : "false");
+        break;
+
     case type_t::int_t:
+        r.append(std::to_string(_n));
+        break;
+
     case type_t::float_t:
-        r.append(_s);
+        r.append(std::to_string(_f));
         break;
 
     default:
